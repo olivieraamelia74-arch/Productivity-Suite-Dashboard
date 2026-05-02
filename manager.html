@@ -266,7 +266,7 @@
         onAuthStateChanged(auth, async (user) => {
             if (!user) { window.location.href = 'index.html'; return; }
             currentUser = user;
-            const userDoc = await getDoc(doc(db, "users", user.uid));
+            const userDoc = await getDoc(doc(db, "user", user.uid));
             if (userDoc.exists()) {
                 userProfile = userDoc.data();
                 if (userProfile.role !== 'manager') {
@@ -330,30 +330,30 @@
                 const records = [];
                 snapshot.forEach(doc => records.push({ id: doc.id, ...doc.data() }));
 
-                const usersSnap = await getDocs(collection(db, "users"));
-                const usersMap = {};
-                usersSnap.forEach(doc => { usersMap[doc.id] = doc.data(); });
+                const userSnap = await getDocs(collection(db, "user"));
+                const userMap = {};
+                userSnap.forEach(doc => { userMap[doc.id] = doc.data(); });
 
-                updateManagerKPIs(records, usersMap);
-                updateManagerCharts(records, usersMap);
-                updateEmployeeTable(records, usersMap);
+                updateManagerKPIs(records, userMap);
+                updateManagerCharts(records, userMap);
+                updateEmployeeTable(records, userMap);
             } catch (error) {
                 console.error('Error loading team data:', error);
             }
         };
 
         // ===== UPDATE KPIs =====
-        function updateManagerKPIs(records, usersMap) {
+        function updateManagerKPIs(records, userMap) {
             if (records.length === 0) {
                 ['kpiTeamProd','kpiTotalTasks','kpiActiveMembers','kpiAvgSession','kpiTopPerformer','kpiTotalLeakage'].forEach(id => {
                     document.getElementById(id).textContent = '--';
                 });
                 return;
             }
-            const uniqueUsers = [...new Set(records.map(r => r.userId))];
+            const uniqueuser = [...new Set(records.map(r => r.userId))];
             document.getElementById('kpiTeamProd').textContent = (records.reduce((s, r) => s + (r.productivity_pct || 0), 0) / records.length).toFixed(1) + '%';
             document.getElementById('kpiTotalTasks').textContent = records.reduce((s, r) => s + (r.tasks_completed || 0), 0);
-            document.getElementById('kpiActiveMembers').textContent = uniqueUsers.length;
+            document.getElementById('kpiActiveMembers').textContent = uniqueuser.length;
             document.getElementById('kpiAvgSession').textContent = Math.round(records.reduce((s, r) => s + (r.session_time || 0), 0) / records.length);
             document.getElementById('kpiTotalLeakage').textContent = records.reduce((s, r) => s + (r.leakage_time || 0), 0);
 
@@ -369,18 +369,18 @@
                 const avg = data.total / data.count;
                 if (avg > topAvg) {
                     topAvg = avg;
-                    topUser = usersMap[uid] ? usersMap[uid].name : uid.substring(0, 8);
+                    topUser = userMap[uid] ? userMap[uid].name : uid.substring(0, 8);
                 }
             });
             document.getElementById('kpiTopPerformer').textContent = topUser.split(' ') || '--';
         }
 
         // ===== UPDATE CHARTS =====
-        function updateManagerCharts(records, usersMap) {
+        function updateManagerCharts(records, userMap) {
             // Group by user
             const byUser = {};
             records.forEach(r => {
-                const name = usersMap[r.userId] ? usersMap[r.userId].name : 'Unknown';
+                const name = userMap[r.userId] ? userMap[r.userId].name : 'Unknown';
                 if (!byUser[name]) byUser[name] = [];
                 byUser[name].push(r);
             });
@@ -495,7 +495,7 @@
         }
 
         // ===== UPDATE EMPLOYEE TABLE =====
-        function updateEmployeeTable(records, usersMap) {
+        function updateEmployeeTable(records, userMap) {
             const tbody = document.getElementById('employeeTableBody');
             if (records.length === 0) {
                 tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;padding:40px;color:rgba(255,255,255,0.4);">No team data found for this date range.</td></tr>';
@@ -506,7 +506,7 @@
             records.forEach(r => {
                 if (!byUser[r.userId]) {
                     byUser[r.userId] = {
-                        name: usersMap[r.userId] ? usersMap[r.userId].name : 'Unknown',
+                        name: userMap[r.userId] ? userMap[r.userId].name : 'Unknown',
                         team: r.team || '--',
                         totalProd: 0, count: 0,
                         totalTasks: 0, totalSession: 0,
