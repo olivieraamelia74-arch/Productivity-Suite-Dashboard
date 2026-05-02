@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stark Dashboard - Manager</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #0f172a; color: #e2e8f0; min-height: 100vh; }
+        .navbar {
+            background: rgba(15,23,42,0.95); border-bottom: 1px solid rgba(255,255,255,0.1);
+            padding: 12px 30px; display: flex; justify-content: space-between; align-items: center;
+            position: sticky; top: 0; z-index: 100; backdrop-filter: blur(10px);
+        }
+        .navbar h1 { font-size: 20px; color: #fff; }
+        .navbar h1 span { color: #f59e0b; }
+        .navbar .badge { background: rgba(239,68,68,0.2); color: #ef4444; padding: 3px 10px; border-radius: 20px; font-size: 11px; margin-left: 10px; border: 1px solid rgba(239,68,68,0.3); }
+        .nav-right { display: flex; align-items: center; gap: 15px; }
+        .nav-right .user-info { color: rgba(255,255,255,0.7); font-size: 14px; }
+        .nav-right .user-info strong { color: #f59e0b; }
+        .btn-logout { padding: 8px 16px; background: rgba(239,68,68,0.2); border: 1px solid rgba(239,68,68,0.3); color: #ef4444; border-radius: 8px; cursor: pointer; font-size: 13px; }
+        .btn-logout:hover { background: rgba(239,68,68,0.3); }
+        .filters-bar { padding: 15px 30px; display: flex; gap: 10px; align-items: center; flex-wrap: wrap; border-bottom: 1px solid rgba(255,255,255,0.05); }
+        .filters-bar label { color: rgba(255,255,255,0.6); font-size: 13px; }
+        .filters-bar input[type="date"], .filters-bar select { padding: 8px 12px; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.15); border-radius: 8px; color: #fff; font-size: 14px; }
+        .filters-bar select option { color: #000; }
+        .filter-btn { padding: 8px 16px; background: #f59e0b; color: #000; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 13px; }
+        .quick-filters { display: flex; gap: 8px; margin-left: 15px; }
+        .quick-filters button { padding: 6px 14px; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.15); color: #fff; border-radius: 8px; cursor: pointer; font-size: 12px; }
+        .quick-filters button:hover, .quick-filters button.active { background: rgba(245,158,11,0.2); border-color: #f59e0b; color: #f59e0b; }
+        .main { padding: 20px 30px; }
+        .kpi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 15px; margin-bottom: 25px; }
+        .kpi-card { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.08); border-radius: 14px; padding: 18px; text-align: center; }
+        .kpi-card:hover { transform: translateY(-3px); transition: 0.3s; }
+        .kpi-card .kpi-value { font-size: 28px; font-weight: 700; color: #fff; margin-bottom: 4px; }
+        .kpi-card .kpi-label { font-size: 11px; color: rgba(255,255,255,0.5); text-transform: uppercase; letter-spacing: 1px; }
+        .kpi-card.highlight { border-color: rgba(245,158,11,0.3); }
+        .kpi-card.highlight .kpi-value { color: #f59e0b; }
+        .charts-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(450px, 1fr)); gap: 20px; margin-bottom: 25px; }
+        .chart-card { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.08); border-radius: 14px; padding: 20px; }
+        .chart-card h3 { font-size: 15px; color: rgba(255,255,255,0.8); margin-bottom: 15px; }
+        .chart-card canvas { max-height: 300px; }
+        .table-card { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.08); border-radius: 14px; padding: 20px; overflow-x: auto; }
+        .table-card h3 { font-size: 15px; color: rgba(255,255,255,0.8); margin-bottom: 15px; }
+        table { width: 100%; border-collapse: collapse; }
+        th { text-align: left; padding: 10px 12px; background: rgba(255,255,255,0.05); color: rgba(255,255,255,0.6); font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px; }
+        td { padding: 10px 12px; border-top: 1px solid rgba(255,255,255,0.05); font-size: 14px; }
+        tr:hover { background: rgba(255,255,255,0.03); }
+        .status-badge { padding: 3px 10px; border-radius: 20px; font-size: 12px; font-weight: 600; }
+        .status-high { background: rgba(34,197,94,0.15); color: #22c55e; }
+        .status-mid { background: rgba(245,158,11,0.15); color: #f59e0b; }
+        .status-low { background: rgba(239,68,68,0.15); color: #ef4444; }
+        @media (max-width: 768px) { .charts-grid { grid-template-columns: 1fr; } .kpi-grid { grid-template-columns: repeat(2, 1fr); } .navbar { padding: 12px 15px; } .main { padding: 15px; } }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <h1>⚡ <span>Stark</span> Dashboard <span class="badge">MANAGER</span></h1>
+        <div class="nav-right">
+            <div class="user-info">Welcome, <strong id="userName">Loading...</strong></div>
+            <button class="btn-logout" onclick="handleLogout()">Sign Out</button>
+        </div>
+    </nav>
+
+    <div class="filters-bar">
+        <label>Team:</label>
+        <select id="teamFilter"><option value="all">All Teams</option><option value="TeamA">Team A</option><option value="TeamB">Team B</option><option value="TeamC">Team C</option></select>
+        <label>From:</label><input type="date" id="startDate">
+        <label>To:</label><input type="date" id="endDate">
+        <button class="filter-btn" onclick="loadTeamData()">Apply</button>
+        <div class="quick-filters">
+            <button onclick="setQuickFilter('today')" class="active">Today</button>
+            <button onclick="setQuickFilter('week')">This Week</button>
+            <button onclick="setQuickFilter('month')">This Month</button>
+        </div>
+    </div>
+
+    <div class="main">
+        <div class="kpi-grid">
+            <div class="kpi-card highlight"><div class="kpi-value" id="kpiTeamProd">--</div><div class="kpi-label">Team Avg Productivity</div></div>
+            <div class="kpi-card"><div class="kpi-value" id="kpiTotalTasks">--</div><div class="kpi-label">Total Tasks</div></div>
+            <div class="kpi-card"><div class="kpi-value" id="kpiActiveMembers">--</div><div class="kpi-label">Active Members</div></div>
+            <div class="kpi-card"><div class="kpi-value" id="kpiAvgSession">--</div><div class="kpi-label">Avg Session (min)</div></div>
+            <div class="kpi-card"><div class="kpi-value" id="kpiTopPerformer">--</div><div class="kpi-label">Top Performer</div></div>
+            <div class="kpi-card"><div class="kpi-value" id="kpiTotalLeakage">--</div><div class="kpi-label">Total Leakage (min)</div></div>
+        </div>
+
+        <div class="charts-grid">
+            <div class="chart-card"><h3>📊 Team Productivity Comparison</h3><canvas id="teamCompareChart"></canvas></div>
+            <div class="chart-card"><h3>📈 Team Productivity Trend</h3><canvas id="teamTrendChart"></canvas></div>
+            <div class="chart-card"><h3>🏆 Employee Ranking (by Productivity)</h3><canvas id="rankingChart"></canvas></div>
+            <div class="chart-card"><h3>⏱️ Time Distribution (Team Average)</h3><canvas id="timeDistChart"></canvas></div>
+        </div>
+
+        <div class="table-card">
+            <h3>👥 Employee Details</h3>
+            <table>
+                <thead><tr><th>Employee</th><th>Team</th><th>Productivity</th><th>Tasks</th><th>Session Time</th><th>Break Time</th><th>Leakage</th><th>Status</th></tr></thead>
+                <tbody id="employeeTableBody"><tr><td colspan="8" style="text-align:center;padding:40px;color:rgba(255,255,255,0.4);">Loading team data...</td></tr></tbody>
+            </table>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-app.js";
+        import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-auth.js";
+        import { getFirestore, collection, query, where, orderBy, getDocs, doc, getDoc } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyBfQArXV1ufPc11kLZGkGygcx6y2wObUJs",
+            authDomain: "productivity-suite-a0329.firebaseapp.com",
+            projectId: "productivity-suite-a0329",
+            storageBucket: "productivity-suite-a0329.firebasestorage.app",
+            messagingSenderId: [US_SOCIAL_SECURITY_NUMBER]6",
+            appId: "1:373942539246:web:c7875b5cec318683a674ff",
+            measurementId: "G-CTBY459SLP"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+        let currentUser = null;
+        let userProfile = null;
+        let teamCompareChart, teamTrendChart, rankingChart, timeDistChart;
+
+        onAuthStateChanged(auth, async (user) => {
+            if (!user) { window.location.href = 'index.html'; return; }
+            currentUser = user;
+            const userDoc = await getDoc(doc(db, "users", user.uid));
+            if (userDoc.exists()) {
+                userProfile = userDoc.data();
+                if (userProfile.role !== 'manager') { window.location.href = 'employee.html'; return; }
+                document.getElementById('userName').textContent = userProfile.name || user.displayName || user.email;
+            }
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('startDate').value = today;
+            document.getElementById('endDate').value = today;
+            loadTeamData();
+        });
+
+        window.handleLogout = async function() { await signOut(auth); window.location.href = 'index.html'; };
+
+        window.setQuickFilter = function(range) {
+            const today = new Date(); let start = new Date();
+            document.querySelectorAll('.quick-filters button').forEach(b => b.classList.remove('active'));
+            event.target.classList.add('active');
+            switch(range) { case 'today': start = today; break; case 'week': start.setDate(today.getDate() - 7); break; case 'month': start.setMonth(today.getMonth() - 1); break; }
+            document.getElementById('startDate').value = start.toISOString().split('T')[0];
+            document.getElementById('endDate').value = today.toISOString().split('T')[0];
+            loadTeamData();
+        };
+
+        window.loadTeamData = async function() {
+            const startDate = document.getElementById('startDate').value;
+            const endDate = document.getElementById('endDate').value;
+            const teamFilter = document.getElementById('teamFilter').value;
+            try {
+                let q;
+                if (teamFilter === 'all') {
+                    q = query(collection(db, "productivity"), where("date", ">=", startDate), where("date", "<=", endDate), orderBy("date", "desc"));
+                } else {
+                    q = query(collection(db, "productivity"), where("team", "==", teamFilter), where("date", ">=", startDate), where("date", "<=", endDate), orderBy("date", "desc"));
+                }
+                const snapshot = await getDocs(q);
+                const records = []; snapshot.forEach(doc => records.push({ id: doc.id, ...doc.data() }));
+                const usersSnap = await getDocs(collection(db, "users"));
+                const usersMap = {}; usersSnap.forEach(doc => { usersMap[doc.id] = doc.data(); });
+                updateManagerKPIs(records, usersMap);
+                updateManagerCharts(records, usersMap);
+                updateEmployeeTable(records, usersMap);
+            } catch (error) { console.error('Error loading team data:', error); }
+        };
+
+        function updateManagerKPIs(records, usersMap) {
+            if (records.length === 0) { ['kpiTeamProd','kpiTotalTasks','kpiActiveMembers','kpiAvgSession','kpiTopPerformer','kpiTotalLeakage'].forEach(id => document.getElementById(id).textContent = '--'); return; }
+            const uniqueUsers = [...new Set(records.map(r => r.userId))];
+            document.getElementById('kpiTeamProd').textContent = (records.reduce((s, r) => s + (r.productivity_pct || 0), 0) / records.length).toFixed(1) + '%';
+            document.getElementById('kpiTotalTasks').textContent = records.reduce((s, r) => s + (r.tasks_completed || 0), 0);
+            document.getElementById('kpiActiveMembers').textContent = uniqueUsers.length;
+            document.getElementById('kpiAvgSession').textContent = Math.round(records.reduce((s, r) => s + (r.session_time || 0), 0) / records.length);
+            document.getElementById('kpiTotalLeakage').textContent = records.reduce((s, r) => s + (r.leakage_time || 0), 0);
+            const userProd = {};
+            records.forEach(r => { if (!userProd[r.userId]) userProd[r.userId] = { total: 0, count: 0 }; userProd[r.userId].total += (r.productivity_pct || 0); userProd[r.userId].count++; });
+            let topUser = '', topAvg = 0;
+            Object.entries(userProd).forEach(([uid, data]) => { const avg = data.total / data.count; if (avg > topAvg) { topAvg = avg; topUser = usersMap[uid] ? usersMap[uid].name : uid.substring(0, 8); } });
+            document.getElementById('kpiTopPerformer').textContent = topUser.split(' ')[0] || '--';
+        }
+
+        function updateManagerCharts(records, usersMap) {
+            const byUser = {};
+            records.forEach(r => { const name = usersMap[r.userId] ? usersMap[r.userId].name : 'Unknown'; if (!byUser[name]) byUser[name] = []; byUser[name].push(r); });
+            const userNames = Object.keys(byUser);
+            const userAvgProd = userNames.map(name => { const recs = byUser[name]; return Math.round((recs.reduce((s, r) => s + (r.productivity_pct || 0), 0) / recs.length) * 10) / 10; });
+
+            if (teamCompareChart) teamCompareChart.destroy();
+            teamCompareChart = new Chart(document.getElementById('teamCompareChart'), {
+                type: 'bar', data: { labels: userNames.map(n => n.split(' ')[0]), datasets: [{ label: 'Avg Productivity %', data: userAvgProd, backgroundColor: userAvgProd.map(v => v >= 80 ? 'rgba(34,197,94,0.6)' : v >= 60 ? 'rgba(245,158,11,0.6)' : 'rgba(239,68,68,0.6)'), borderRadius: 6 }] },
+                options: { responsive: true, plugins: { legend: { labels: { color: '#94a3b8' } } }, scales: { x: { ticks: { color: '#64748b' }, grid: { color: 'rgba(255,255,255,0.05)' } }, y: { ticks: { color: '#64748b' }, grid: { color: 'rgba(255,255,255,0.05)' }, min: 0, max: 100 } } }
+            });
+
+            const byDate = {};
+            records.forEach(r => { if (!byDate[r.date]) byDate[r.date] = []; byDate[r.date].push(r); });
+            const dates = Object.keys(byDate).sort();
+            const dateAvgs = dates.map(d => { const recs = byDate[d]; return Math.round((recs.reduce((s, r) => s + (r.productivity_pct || 0), 0) / recs.length) * 10) / 10; });
+
+            if (teamTrendChart) teamTrendChart.destroy();
+            teamTrendChart = new Chart(document.getElementById('teamTrendChart'), {
+                type: 'line', data: { labels: dates, datasets: [{ label: 'Team Avg Productivity %', data: dateAvgs, borderColor: '#f59e0b', backgroundColor: 'rgba(245,158,11,0.1)', fill: true, tension: 0.4, pointRadius: 4, pointBackgroundColor: '#f59e0b' }] },
+                options: { responsive: true, plugins: { legend: { labels: { color: '#94a3b8' } } }, scales: { x: { ticks: { color: '#64748b' }, grid: { color: 'rgba(255,255,255,0.05)' } }, y: { ticks: { color: '#64748b' }, grid: { color: 'rgba(255,255,255,0.05)' }, min: 0, max: 100 } } }
+            });
+
+            const sorted = userNames.map((name, i) => ({ name, prod: userAvgProd[i] })).sort((a, b) => b.prod - a.prod);
+            if (rankingChart) rankingChart.destroy();
+            rankingChart = new Chart(document.getElementById('rankingChart'), {
+                type: 'bar', data: { labels: sorted.map(s => s.name.split(' ')[0]), datasets: [{ label: 'Productivity %', data: sorted.map(s => s.prod), backgroundColor: sorted.map((s, i) => i === 0 ? 'rgba(245,158,11,0.8)' : 'rgba(59,130,246,0.6)'), borderRadius: 6 }] },
+                options: { indexAxis: 'y', responsive: true, plugins: { legend: { labels: { color: '#94a3b8' } } }, scales: { x: { ticks: { color: '#64748b' }, grid: { color: 'rgba(255,255,255,0.05)' }, min: 0, max: 100 }, y: { ticks: { color: '#64748b' }, grid: { color: 'rgba(255,255,255,0.05)' } } } }
+            });
+
+            if (timeDistChart) timeDistChart.destroy();
+            timeDistChart = new Chart(document.getElementById('timeDistChart'), {
+                type: 'doughnut', data: { labels: ['Session', 'Break', 'Productive DT', 'Non-Productive DT', 'Leakage'], datasets: [{ data: [records.reduce((s, r) => s + (r.session_time || 0), 0), records.reduce((s, r) => s + (r.break_time || 0), 0), records.reduce((s, r) => s + (r.productive_downtime || 0), 0), records.reduce((s, r) => s + (r.non_productive_downtime || 0), 0), records.reduce((s, r) => s + (r.leakage_time || 0), 0)], backgroundColor: ['#f59e0b', '#22c55e', '#3b82f6', '#ef4444', '#8b5cf6'] }] },
+                options: { responsive: true, plugins: { legend: { position: 'bottom', labels: { color: '#94a3b8', padding: 15 } } } }
+            });
+        }
+
+        function updateEmployeeTable(records, usersMap) {
+            const tbody = document.getElementById('employeeTableBody');
+            if (records.length === 0) { tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;padding:40px;color:rgba(255,255,255,0.4);">No team data found for this date range.</td></tr>'; return; }
+            const byUser = {};
+            records.forEach(r => {
+                if (!byUser[r.userId]) { byUser[r.userId] = { name: usersMap[r.userId] ? usersMap[r.userId].name : 'Unknown', team: r.team || '--', totalProd: 0, count: 0, totalTasks: 0, totalSession: 0, totalBreak: 0, totalLeakage: 0 }; }
+                byUser[r.userId].totalProd += (r.productivity_pct || 0); byUser[r.userId].count++;
+                byUser[r.userId].totalTasks += (r.tasks_completed || 0); byUser[r.userId].totalSession += (r.session_time || 0);
+                byUser[r.userId].totalBreak += (r.break_time || 0); byUser[r.userId].totalLeakage += (r.leakage_time || 0);
+            });
+            const rows = Object.values(byUser).sort((a, b) => (b.totalProd / b.count) - (a.totalProd / a.count));
+            tbody.innerHTML = rows.map(r => {
+                const avgProd = (r.totalProd / r.count).toFixed(1);
+                let statusClass, statusText;
+                if (avgProd >= 80) { statusClass = 'status-high'; statusText = 'Excellent'; }
+                else if (avgProd >= 60) { statusClass = 'status-mid'; statusText = 'Good'; }
+                else { statusClass = 'status-low'; statusText = 'Needs Improvement'; }
+                return `<tr><td><strong>${r.name}</strong></td><td>${r.team}</td><td style="color:${avgProd >= 80 ? '#22c55e' : avgProd >= 60 ? '#f59e0b' : '#ef4444'}">${avgProd}%</td><td>${r.totalTasks}</td><td>${Math.round(r.totalSession / r.count)} min</td><td>${Math.round(r.totalBreak / r.count)} min</td><td>${Math.round(r.totalLeakage / r.count)} min</td><td><span class="status-badge ${statusClass}">${statusText}</span></td></tr>`;
+            }).join('');
+        }
+    </script>
+</body>
+</html>
