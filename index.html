@@ -336,7 +336,7 @@
         // ===== AUTO-REDIRECT IF ALREADY LOGGED IN =====
         onAuthStateChanged(auth, async function(user) {
             if (user) {
-                var userDoc = await getDoc(doc(db, "users", user.uid));
+                var userDoc = await getDoc(doc(db, "user", user.uid));
                 if (userDoc.exists()) {
                     var role = userDoc.data().role;
                     if (role === 'manager') {
@@ -375,7 +375,7 @@
 
             try {
                 var userCredential = await signInWithEmailAndPassword(auth, email, password);
-                var userDoc = await getDoc(doc(db, "users", userCredential.user.uid));
+                var userDoc = await getDoc(doc(db, "user", userCredential.user.uid));
 
                 successMsg.textContent = '✅ Welcome back! Redirecting...';
                 successMsg.style.display = 'block';
