@@ -6,7 +6,6 @@
     <title>Stark Productivity Suite</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
-
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background: #0a0a1a;
@@ -16,8 +15,6 @@
             justify-content: center;
             overflow: hidden;
         }
-
-        /* ===== ANIMATED BACKGROUND ===== */
         .bg-animation {
             position: fixed;
             top: 0; left: 0;
@@ -37,8 +34,6 @@
             90% { opacity: 1; }
             100% { transform: translateY(-10vh) rotate(720deg); opacity: 0; }
         }
-
-        /* ===== GLOWING ORB ===== */
         .glow-orb {
             position: fixed;
             width: 400px; height: 400px;
@@ -53,8 +48,6 @@
             0%, 100% { transform: translate(-50%, -50%) scale(1); opacity: 0.5; }
             50% { transform: translate(-50%, -50%) scale(1.3); opacity: 0.8; }
         }
-
-        /* ===== LOGIN CONTAINER ===== */
         .login-container {
             position: relative;
             z-index: 10;
@@ -74,12 +67,7 @@
             0% { opacity: 0; transform: translateY(40px); }
             100% { opacity: 1; transform: translateY(0); }
         }
-
-        /* ===== LOGO ===== */
-        .logo {
-            text-align: center;
-            margin-bottom: 35px;
-        }
+        .logo { text-align: center; margin-bottom: 35px; }
         .logo-icon {
             font-size: 48px;
             margin-bottom: 10px;
@@ -90,54 +78,38 @@
             50% { transform: scale(1.1); }
         }
         .logo h1 {
-            color: #fff;
-            font-size: 26px;
-            font-weight: 700;
-            letter-spacing: -0.5px;
+            color: #fff; font-size: 26px;
+            font-weight: 700; letter-spacing: -0.5px;
         }
         .logo h1 span { color: #f59e0b; }
         .logo p {
-            color: rgba(255,255,255,0.4);
-            font-size: 13px;
-            margin-top: 6px;
-            letter-spacing: 2px;
+            color: rgba(255,255,255,0.4); font-size: 13px;
+            margin-top: 6px; letter-spacing: 2px;
             text-transform: uppercase;
         }
-
-        /* ===== FORM ===== */
         .form-group {
             margin-bottom: 22px;
             position: relative;
         }
         .form-group label {
-            display: block;
-            color: rgba(255,255,255,0.6);
-            font-size: 12px;
-            margin-bottom: 8px;
-            font-weight: 600;
-            text-transform: uppercase;
+            display: block; color: rgba(255,255,255,0.6);
+            font-size: 12px; margin-bottom: 8px;
+            font-weight: 600; text-transform: uppercase;
             letter-spacing: 1px;
         }
-        .input-wrapper {
-            position: relative;
-        }
+        .input-wrapper { position: relative; }
         .input-wrapper .icon {
-            position: absolute;
-            left: 14px; top: 50%;
+            position: absolute; left: 14px; top: 50%;
             transform: translateY(-50%);
-            font-size: 16px;
-            opacity: 0.4;
+            font-size: 16px; opacity: 0.4;
             transition: opacity 0.3s;
         }
         .form-group input {
-            width: 100%;
-            padding: 14px 16px 14px 42px;
+            width: 100%; padding: 14px 16px 14px 42px;
             background: rgba(255,255,255,0.06);
             border: 1px solid rgba(255,255,255,0.1);
-            border-radius: 12px;
-            color: #fff;
-            font-size: 15px;
-            outline: none;
+            border-radius: 12px; color: #fff;
+            font-size: 15px; outline: none;
             transition: all 0.3s;
         }
         .form-group input:focus {
@@ -145,51 +117,26 @@
             background: rgba(245,158,11,0.05);
             box-shadow: 0 0 20px rgba(245,158,11,0.1);
         }
-        .form-group input:focus + .focus-line,
-        .form-group input:focus ~ .icon {
-            opacity: 1;
-        }
-        .form-group input::placeholder {
-            color: rgba(255,255,255,0.25);
-        }
-
-        /* ===== BUTTON ===== */
+        .form-group input::placeholder { color: rgba(255,255,255,0.25); }
         .btn-login {
-            width: 100%;
-            padding: 15px;
-            border: none;
-            border-radius: 12px;
-            font-size: 16px;
-            font-weight: 700;
-            cursor: pointer;
-            transition: all 0.3s;
-            margin-top: 10px;
+            width: 100%; padding: 15px; border: none;
+            border-radius: 12px; font-size: 16px;
+            font-weight: 700; cursor: pointer;
+            transition: all 0.3s; margin-top: 10px;
             background: linear-gradient(135deg, #f59e0b, #d97706);
-            color: #000;
-            letter-spacing: 0.5px;
-            position: relative;
-            overflow: hidden;
+            color: #000; letter-spacing: 0.5px;
+            position: relative; overflow: hidden;
         }
         .btn-login:hover {
             transform: translateY(-2px);
             box-shadow: 0 8px 25px rgba(245,158,11,0.4);
         }
-        .btn-login:active {
-            transform: translateY(0);
-        }
+        .btn-login:active { transform: translateY(0); }
         .btn-login .btn-text { position: relative; z-index: 1; }
-        .btn-login .btn-loader {
-            display: none;
-            position: relative; z-index: 1;
-        }
+        .btn-login .btn-loader { display: none; position: relative; z-index: 1; }
         .btn-login.loading .btn-text { display: none; }
         .btn-login.loading .btn-loader { display: inline-block; }
-        .btn-login.loading {
-            opacity: 0.8;
-            pointer-events: none;
-        }
-
-        /* ===== SPINNER ===== */
+        .btn-login.loading { opacity: 0.8; pointer-events: none; }
         .spinner {
             width: 20px; height: 20px;
             border: 3px solid rgba(0,0,0,0.2);
@@ -199,22 +146,14 @@
             display: inline-block;
             vertical-align: middle;
         }
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
-
-        /* ===== MESSAGES ===== */
+        @keyframes spin { to { transform: rotate(360deg); } }
         .error-msg {
             background: rgba(239,68,68,0.1);
             border: 1px solid rgba(239,68,68,0.2);
-            color: #ef4444;
-            padding: 10px 14px;
-            border-radius: 10px;
-            font-size: 13px;
-            text-align: center;
-            margin-bottom: 15px;
-            display: none;
-            animation: shakeX 0.5s;
+            color: #ef4444; padding: 10px 14px;
+            border-radius: 10px; font-size: 13px;
+            text-align: center; margin-bottom: 15px;
+            display: none; animation: shakeX 0.5s;
         }
         @keyframes shakeX {
             0%, 100% { transform: translateX(0); }
@@ -224,58 +163,32 @@
         .success-msg {
             background: rgba(34,197,94,0.1);
             border: 1px solid rgba(34,197,94,0.2);
-            color: #22c55e;
-            padding: 10px 14px;
-            border-radius: 10px;
-            font-size: 13px;
-            text-align: center;
-            margin-bottom: 15px;
+            color: #22c55e; padding: 10px 14px;
+            border-radius: 10px; font-size: 13px;
+            text-align: center; margin-bottom: 15px;
             display: none;
         }
-
-        /* ===== FOOTER ===== */
         .login-footer {
-            text-align: center;
-            margin-top: 25px;
+            text-align: center; margin-top: 25px;
             padding-top: 20px;
             border-top: 1px solid rgba(255,255,255,0.06);
         }
-        .login-footer p {
-            color: rgba(255,255,255,0.3);
-            font-size: 11px;
-            letter-spacing: 0.5px;
-        }
-        .login-footer .version {
-            color: rgba(245,158,11,0.4);
-            font-size: 10px;
-            margin-top: 5px;
-        }
-
-        /* ===== CLOCK ===== */
+        .login-footer p { color: rgba(255,255,255,0.3); font-size: 11px; letter-spacing: 0.5px; }
+        .login-footer .version { color: rgba(245,158,11,0.4); font-size: 10px; margin-top: 5px; }
         .live-clock {
-            text-align: center;
-            margin-bottom: 20px;
-            color: rgba(255,255,255,0.3);
-            font-size: 12px;
-            font-family: 'Courier New', monospace;
-            letter-spacing: 2px;
+            text-align: center; margin-bottom: 20px;
+            color: rgba(255,255,255,0.3); font-size: 12px;
+            font-family: 'Courier New', monospace; letter-spacing: 2px;
         }
-
-        /* ===== RESPONSIVE ===== */
         @media (max-width: 480px) {
-            .login-container {
-                width: 90%;
-                padding: 30px 25px;
-            }
+            .login-container { width: 90%; padding: 30px 25px; }
         }
     </style>
 </head>
 <body>
-        <!-- ANIMATED BACKGROUND -->
-    <div class="bg-animation" id="bgAnimation"></div>
+        <div class="bg-animation" id="bgAnimation"></div>
     <div class="glow-orb"></div>
 
-    <!-- LOGIN BOX -->
     <div class="login-container">
         <div class="logo">
             <div class="logo-icon">⚡</div>
@@ -333,7 +246,6 @@
         var auth = getAuth(app);
         var db = getFirestore(app);
 
-        // ===== AUTO-REDIRECT IF ALREADY LOGGED IN =====
         onAuthStateChanged(auth, async function(user) {
             if (user) {
                 var userDoc = await getDoc(doc(db, "user", user.uid));
@@ -348,7 +260,6 @@
             }
         });
 
-        // ===== LOGIN HANDLER =====
         window.handleLogin = async function() {
             var alias = document.getElementById('loginAlias').value.trim();
             var password = document.getElementById('loginPassword').value;
@@ -365,7 +276,6 @@
                 return;
             }
 
-            // Convert alias to email format for Firebase Auth
             var email = alias;
             if (alias.indexOf('@') === -1) {
                 email = alias + '@starkteam.com';
@@ -409,14 +319,10 @@
             }
         };
 
-        // ===== ENTER KEY SUPPORT =====
         document.addEventListener('keydown', function(e) {
-            if (e.key === 'Enter') {
-                handleLogin();
-            }
+            if (e.key === 'Enter') { handleLogin(); }
         });
 
-        // ===== LIVE CLOCK =====
         function updateClock() {
             var now = new Date();
             var options = { weekday: 'short', year: 'numeric', month: 'short', day: 'numeric' };
@@ -427,7 +333,6 @@
         updateClock();
         setInterval(updateClock, 1000);
 
-        // ===== FLOATING PARTICLES =====
         function createParticles() {
             var container = document.getElementById('bgAnimation');
             for (var i = 0; i < 30; i++) {
