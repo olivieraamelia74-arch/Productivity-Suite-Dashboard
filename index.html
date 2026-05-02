@@ -1,1 +1,225 @@
 
+<body>
+    <div class="login-container" id="loginContainer">
+        <div class="logo">
+            <h1>⚡ <span>Stark</span> Productivity</h1>
+            <p>Real-time Team Dashboard</p>
+        </div>
+
+        <div id="errorMsg" class="error-msg"></div>
+        <div id="successMsg" class="success-msg"></div>
+
+        <!-- LOGIN FORM -->
+        <div id="loginForm">
+            <div class="form-group">
+                <label>Email</label>
+                <input type="email" id="loginEmail" placeholder="your.alias@email.com">
+            </div>
+            <div class="form-group">
+                <label>Password</label>
+                <input type="password" id="loginPassword" placeholder="Enter password">
+            </div>
+            <button class="btn btn-primary" onclick="handleLogin()">Sign In</button>
+            <div class="toggle-mode">
+                <a onclick="toggleMode('register')">Don't have an account? Register</a>
+            </div>
+        </div>
+
+        <!-- REGISTER FORM -->
+        <div id="registerForm" style="display:none;">
+            <div class="form-group">
+                <label>Full Name</label>
+                <input type="text" id="regName" placeholder="e.g. Shouvik Kumar">
+            </div>
+            <div class="form-group">
+                <label>Email</label>
+                <input type="email" id="regEmail" placeholder="your.alias@email.com">
+            </div>
+            <div class="form-group">
+                <label>Password (min 6 characters)</label>
+                <input type="password" id="regPassword" placeholder="Create password">
+            </div>
+            <div class="form-group">
+                <label>Team</label>
+                <select id="regTeam" class="select-field">
+                    <option value="TeamA">Team A</option>
+                    <option value="TeamB">Team B</option>
+                    <option value="TeamC">Team C</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Role</label>
+                <select id="regRole" class="select-field">
+                    <option value="employee">Employee</option>
+                    <option value="manager">Manager</option>
+                </select>
+            </div>
+            <button class="btn btn-primary" onclick="handleRegister()">Create Account</button>
+            <div class="toggle-mode">
+                <a onclick="toggleMode('login')">Already have an account? Sign In</a>
+            </div>
+        </div>
+    </div>
+        <!-- Firebase SDK -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-app.js";
+        import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, updateProfile, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-auth.js";
+        import { getFirestore, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyBfQArXV1ufPc11kLZGkGygcx6y2wObUJs",
+            authDomain: "productivity-suite-a0329.firebaseapp.com",
+            projectId: "productivity-suite-a0329",
+            storageBucket: "productivity-suite-a0329.firebasestorage.app",
+            messagingSenderId: "373942539246",
+            appId: "1:373942539246:web:c7875b5cec318683a674ff",
+            measurementId: "G-CTBY459SLP"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        // Check if already logged in — redirect to correct dashboard
+        onAuthStateChanged(auth, async (user) => {
+            if (user) {
+                const userDoc = await getDoc(doc(db, "users", user.uid));
+                if (userDoc.exists()) {
+                    const role = userDoc.data().role;
+                    if (role === 'manager') {
+                        window.location.href = 'manager.html';
+                    } else {
+                        window.location.href = 'employee.html';
+                    }
+                }
+            }
+        });
+
+        // ===== LOGIN HANDLER =====
+        window.handleLogin = async function() {
+            const email = document.getElementById('loginEmail').value;
+            const password = document.getElementById('loginPassword').value;
+            const errorMsg = document.getElementById('errorMsg');
+            const container = document.getElementById('loginContainer');
+            errorMsg.textContent = '';
+
+            if (!email || !password) {
+                errorMsg.textContent = 'Please fill in all fields';
+                return;
+            }
+
+            container.classList.add('loading');
+
+            try {
+                const userCredential = await signInWithEmailAndPassword(auth, email, password);
+                const userDoc = await getDoc(doc(db, "users", userCredential.user.uid));
+
+                if (userDoc.exists()) {
+                    const role = userDoc.data().role;
+                    if (role === 'manager') {
+                        window.location.href = 'manager.html';
+                    } else {
+                        window.location.href = 'employee.html';
+                    }
+                } else {
+                    window.location.href = 'employee.html';
+                }
+            } catch (error) {
+                container.classList.remove('loading');
+                if (error.code === 'auth/user-not-found') {
+                    errorMsg.textContent = 'No account found with this email';
+                } else if (error.code === 'auth/wrong-password' || error.code === 'auth/invalid-credential') {
+                    errorMsg.textContent = 'Incorrect password';
+                } else {
+                    errorMsg.textContent = 'Login failed: ' + error.message;
+                }
+            }
+        };
+
+        // ===== REGISTER HANDLER =====
+        window.handleRegister = async function() {
+            const name = document.getElementById('regName').value;
+            const email = document.getElementById('regEmail').value;
+            const password = document.getElementById('regPassword').value;
+            const team = document.getElementById('regTeam').value;
+            const role = document.getElementById('regRole').value;
+            const errorMsg = document.getElementById('errorMsg');
+            const successMsg = document.getElementById('successMsg');
+            const container = document.getElementById('loginContainer');
+            errorMsg.textContent = '';
+            successMsg.textContent = '';
+
+            if (!name || !email || !password) {
+                errorMsg.textContent = 'Please fill in all fields';
+                return;
+            }
+
+            if (password.length < 6) {
+                errorMsg.textContent = 'Password must be at least 6 characters';
+                return;
+            }
+
+            container.classList.add('loading');
+
+            try {
+                const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+                await updateProfile(userCredential.user, { displayName: name });
+
+                // Save user profile to Firestore
+                await setDoc(doc(db, "users", userCredential.user.uid), {
+                    name: name,
+                    email: email,
+                    team: team,
+                    role: role,
+                    createdAt: new Date().toISOString()
+                });
+
+                container.classList.remove('loading');
+                successMsg.textContent = 'Account created! Redirecting...';
+
+                setTimeout(() => {
+                    if (role === 'manager') {
+                        window.location.href = 'manager.html';
+                    } else {
+                        window.location.href = 'employee.html';
+                    }
+                }, 1500);
+
+            } catch (error) {
+                container.classList.remove('loading');
+                if (error.code === 'auth/email-already-in-use') {
+                    errorMsg.textContent = 'This email is already registered';
+                } else if (error.code === 'auth/weak-password') {
+                    errorMsg.textContent = 'Password is too weak (min 6 characters)';
+                } else {
+                    errorMsg.textContent = 'Registration failed: ' + error.message;
+                }
+            }
+        };
+
+        // ===== TOGGLE LOGIN / REGISTER =====
+        window.toggleMode = function(mode) {
+            document.getElementById('errorMsg').textContent = '';
+            document.getElementById('successMsg').textContent = '';
+            if (mode === 'register') {
+                document.getElementById('loginForm').style.display = 'none';
+                document.getElementById('registerForm').style.display = 'block';
+            } else {
+                document.getElementById('loginForm').style.display = 'block';
+                document.getElementById('registerForm').style.display = 'none';
+            }
+        };
+
+        // ===== ENTER KEY SUPPORT =====
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                if (document.getElementById('loginForm').style.display !== 'none') {
+                    handleLogin();
+                } else {
+                    handleRegister();
+                }
+            }
+        });
+    </script>
+</body>
+</html>
