@@ -253,7 +253,7 @@
             } else {
                 document.getElementById('userName').textContent = user.displayName || user.email;
             }
-            var today = new Date().toISOString().split('T');
+            var today = new Date().toISOString().split('T')[0];
             document.getElementById('startDate').value = today;
             document.getElementById('endDate').value = today;
             loadData();
