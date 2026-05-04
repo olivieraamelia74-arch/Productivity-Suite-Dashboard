@@ -409,7 +409,7 @@
                     return;
                 }
                 clearTimeout(pageLoadTimeout);
-                var today = new Date().toISOString().split('T');
+                var today = new Date().toISOString().split('T')[0];
                 document.getElementById('startDate').value = today;
                 document.getElementById('endDate').value = today;
                 loadTeamData();
@@ -441,8 +441,8 @@
                 case 'week': start.setDate(today.getDate() - 7); break;
                 case 'month': start.setMonth(today.getMonth() - 1); break;
             }
-            document.getElementById('startDate').value = start.toISOString().split('T');
-            document.getElementById('endDate').value = today.toISOString().split('T');
+            document.getElementById('startDate').value = start.toISOString().split('T')[0];
+            document.getElementById('endDate').value = today.toISOString().split('T')[0];
             loadTeamData();
         };
 
@@ -823,7 +823,7 @@
             var startDate = document.getElementById('startDate').value;
             var endDate = document.getElementById('endDate').value;
             if (!startDate || !endDate) {
-                var today = new Date().toISOString().split('T');
+                var today = new Date().toISOString().split('T')[0];
                 startDate = today;
                 endDate = today;
             }
