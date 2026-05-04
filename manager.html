@@ -761,7 +761,7 @@
                 if (avgProd >= 80) { statusClass = 'status-high'; statusText = 'Excellent'; }
                 else if (avgProd >= 60) { statusClass = 'status-mid'; statusText = 'Good'; }
                 else { statusClass = 'status-low'; statusText = 'Needs Improvement'; }
-                var prodColor = avgProd >= 80 ? '[MAC_ADDRESS]e' : avgProd >= 60 ? '#f59e0b' : '#ef4444';
+                var prodColor = avgProd >= 80 ? '#22c55e' : avgProd >= 60 ? '#f59e0b' : '#ef4444';
 
                 var safeName = r.name.replace(/'/g, "\\'");
                 var safeEmail = r.email.replace(/'/g, "\\'");
@@ -901,7 +901,7 @@
 
                 document.getElementById('empDetailProductivity').textContent = avgProd + '%';
                 document.getElementById('empDetailProductivity').style.color =
-                    avgProd >= 85 ? '[MAC_ADDRESS]e' : avgProd >= 60 ? '#f59e0b' : '#ef4444';
+                    avgProd >= 85 ? '#22c55e' : avgProd >= 60 ? '#f59e0b' : '#ef4444';
                 document.getElementById('empDetailTasks').textContent = totalTasks;
                 document.getElementById('empDetailSession').textContent = avgSession + ' min';
                 document.getElementById('empDetailBreak').textContent = avgBreak + ' min';
@@ -919,19 +919,19 @@
                 document.getElementById('empDetailShiftBar').innerHTML =
                     '<div style="width:' + sessionPct + '%;background:#3b82f6;" title="Session: ' + avgSession + ' min (' + sessionPct + '%)"></div>' +
                     '<div style="width:' + breakPct + '%;background:#a855f7;" title="Break: ' + avgBreak + ' min (' + breakPct + '%)"></div>' +
-                    '<div style="width:' + prodDTPct + '%;background:[MAC_ADDRESS]e;" title="Productive DT: ' + avgProdDT + ' min (' + prodDTPct + '%)"></div>' +
+                    '<div style="width:' + prodDTPct + '%;background:#22c55e;" title="Productive DT: ' + avgProdDT + ' min (' + prodDTPct + '%)"></div>' +
                     '<div style="width:' + nonProdDTPct + '%;background:#f97316;" title="Non-Prod DT: ' + avgNonProdDT + ' min (' + nonProdDTPct + '%)"></div>' +
                     '<div style="width:' + leakPct + '%;background:#ef4444;" title="Leakage: ' + avgLeak + ' min (' + leakPct + '%)"></div>';
 
                 document.getElementById('empDetailShiftLegend').innerHTML =
                     '<span style="color:#3b82f6;font-size:11px;">&#9679; Session ' + sessionPct + '%</span>' +
                     '<span style="color:#a855f7;font-size:11px;">&#9679; Break ' + breakPct + '%</span>' +
-                    '<span style="color:[MAC_ADDRESS]e;font-size:11px;">&#9679; Prod DT ' + prodDTPct + '%</span>' +
+                    '<span style="color:#22c55e;font-size:11px;">&#9679; Prod DT ' + prodDTPct + '%</span>' +
                     '<span style="color:#f97316;font-size:11px;">&#9679; Non-Prod ' + nonProdDTPct + '%</span>' +
                     '<span style="color:#ef4444;font-size:11px;">&#9679; Leakage ' + leakPct + '%</span>';
 
                 // ===== Process Breakdown =====
-                var processColors = ['#f59e0b', '#3b82f6', '[MAC_ADDRESS]e', '#ef4444', '#8b5cf6', '#ec4899', '#14b8a6', '#f97316'];
+                var processColors = ['#f59e0b', '#3b82f6', '#22c55e', '#ef4444', '#8b5cf6', '#ec4899', '#14b8a6', '#f97316'];
                 var pKeys = Object.keys(allProcesses).sort(function(a, b) { return allProcesses[b] - allProcesses[a]; });
                 var processHtml = '';
                 for (var p = 0; p < pKeys.length; p++) {
@@ -950,7 +950,7 @@
                 var historyHtml = '';
                 for (var h = 0; h < dailyRecords.length; h++) {
                     var rec = dailyRecords[h];
-                    var prodColor = rec.productivity >= 85 ? '[MAC_ADDRESS]e' : rec.productivity >= 60 ? '#f59e0b' : '#ef4444';
+                    var prodColor = rec.productivity >= 85 ? '#22c55e' : rec.productivity >= 60 ? '#f59e0b' : '#ef4444';
                     var leakColor = rec.leakage > 60 ? '#ef4444' : '#f59e0b';
                     historyHtml += '<tr style="border-bottom:1px solid rgba(255,255,255,0.05);">' +
                         '<td style="padding:8px;color:#e2e8f0;">' + rec.date + '</td>' +
