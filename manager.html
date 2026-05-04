@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -6,177 +7,271 @@
     <title>Stark Dashboard - Manager</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
-        * { margin:0; padding:0; box-sizing:border-box; }
-        body { font-family:'Segoe UI',system-ui,-apple-system,sans-serif; background:#0a0e1a; color:#e2e8f0; min-height:100vh; }
-        .navbar { background:rgba(15,23,42,0.95); backdrop-filter:blur(20px); border-bottom:1px solid rgba(245,158,11,0.2);
-            padding:15px 30px; display:flex; justify-content:space-between; align-items:center; position:sticky; top:0; z-index:1000; }
-        .nav-brand { display:flex; align-items:center; gap:12px; }
-        .nav-brand span:first-child { font-size:24px; }
-        .nav-brand .title { font-size:20px; font-weight:700; }
-        .nav-brand .title .stark { color:#f59e0b; }
-        .nav-brand .badge { background:linear-gradient(135deg,#f59e0b,#d97706); color:#000; padding:3px 10px;
-            border-radius:6px; font-size:10px; font-weight:800; letter-spacing:1px; margin-left:8px; }
-        .nav-right { display:flex; align-items:center; gap:15px; }
-        .nav-right .welcome { color:rgba(255,255,255,0.6); font-size:13px; }
-        .nav-right .welcome strong { color:#f59e0b; }
-        .btn-signout { background:rgba(239,68,68,0.15); border:1px solid rgba(239,68,68,0.3); color:#ef4444;
-            padding:8px 16px; border-radius:8px; cursor:pointer; font-size:12px; font-weight:600; transition:all 0.3s; }
-        .btn-signout:hover { background:rgba(239,68,68,0.3); }
-        .container { max-width:1400px; margin:0 auto; padding:25px; }
-        .filters { display:flex; gap:12px; align-items:center; flex-wrap:wrap; margin-bottom:25px;
-            background:rgba(255,255,255,0.03); padding:15px 20px; border-radius:12px; border:1px solid rgba(255,255,255,0.06); }
-        .filters label { color:rgba(255,255,255,0.5); font-size:12px; font-weight:600; }
-        .filters input, .filters select { background:rgba(255,255,255,0.08); border:1px solid rgba(255,255,255,0.15);
-            color:#fff; padding:8px 12px; border-radius:8px; font-size:13px; }
-        .filters input:focus, .filters select:focus { outline:none; border-color:#f59e0b; }
-        .btn-filter { padding:8px 16px; border:none; border-radius:8px; font-size:12px; font-weight:600; cursor:pointer; transition:all 0.3s; }
-        .btn-primary { background:linear-gradient(135deg,#f59e0b,#d97706); color:#000; }
-        .btn-secondary { background:rgba(255,255,255,0.08); color:#e2e8f0; border:1px solid rgba(255,255,255,0.15); }
-        .btn-secondary:hover, .btn-secondary.active { background:rgba(245,158,11,0.15); color:#f59e0b; border-color:rgba(245,158,11,0.3); }
-        .kpi-grid { display:grid; grid-template-columns:repeat(6,1fr); gap:15px; margin-bottom:25px; }
-        .kpi-card { background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.06); border-radius:14px;
-            padding:20px; text-align:center; transition:all 0.3s; }
-        .kpi-card:hover { border-color:rgba(245,158,11,0.3); transform:translateY(-2px); }
-        .kpi-label { color:rgba(255,255,255,0.4); font-size:10px; text-transform:uppercase; letter-spacing:1.5px; margin-bottom:8px; }
-        .kpi-value { font-size:28px; font-weight:700; color:#f59e0b; }
-        .charts-grid { display:grid; grid-template-columns:1fr 1fr; gap:20px; margin-bottom:25px; }
-        .chart-card { background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.06);
-            border-radius:14px; padding:20px; }
-        .chart-card h3 { color:rgba(255,255,255,0.7); font-size:13px; margin-bottom:15px; font-weight:600; }
-        .chart-card canvas { max-height:250px; }
-        .table-section { background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.06);
-            border-radius:14px; padding:20px; margin-bottom:25px; }
-        .table-section h3 { color:rgba(255,255,255,0.7); font-size:14px; margin-bottom:15px; font-weight:600; }
-        table { width:100%; border-collapse:collapse; }
-        thead th { padding:12px; color:rgba(255,255,255,0.4); font-size:11px; text-transform:uppercase;
-            letter-spacing:1px; text-align:left; border-bottom:1px solid rgba(255,255,255,0.1); }
-        tbody tr { border-bottom:1px solid rgba(255,255,255,0.04); transition:background 0.2s; }
-        tbody tr:hover { background:rgba(245,158,11,0.05); }
-        .loading { text-align:center; color:rgba(255,255,255,0.3); padding:40px; font-size:14px; }
-        @media (max-width:768px) {
-            .kpi-grid { grid-template-columns:repeat(2,1fr); }
-            .charts-grid { grid-template-columns:1fr; }
-            .filters { flex-direction:column; }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #0f172a; color: #e2e8f0; min-height: 100vh;
         }
-        @keyframes slideUp { 0%{opacity:0;transform:translateY(40px);} 100%{opacity:1;transform:translateY(0);} }
-        #empDetailOverlay { display:none; position:fixed; top:0; left:0; width:100%; height:100%;
-            background:rgba(0,0,0,0.7); z-index:99999; backdrop-filter:blur(8px);
-            align-items:center; justify-content:center; }
-        #empDetailOverlay.active { display:flex !important; }
+        .navbar {
+            background: rgba(15,23,42,0.95);
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            padding: 12px 30px; display: flex;
+            justify-content: space-between; align-items: center;
+            position: sticky; top: 0; z-index: 100;
+            backdrop-filter: blur(10px);
+        }
+        .navbar h1 { font-size: 20px; color: #fff; }
+        .navbar h1 span { color: #f59e0b; }
+        .navbar .badge {
+            background: rgba(239,68,68,0.2); color: #ef4444;
+            padding: 3px 10px; border-radius: 20px;
+            font-size: 11px; margin-left: 10px;
+            border: 1px solid rgba(239,68,68,0.3);
+        }
+        .nav-right { display: flex; align-items: center; gap: 15px; }
+        .nav-right .user-info { color: rgba(255,255,255,0.7); font-size: 14px; }
+        .nav-right .user-info strong { color: #f59e0b; }
+        .btn-logout {
+            padding: 8px 16px; background: rgba(239,68,68,0.2);
+            border: 1px solid rgba(239,68,68,0.3);
+            color: #ef4444; border-radius: 8px;
+            cursor: pointer; font-size: 13px;
+        }
+        .btn-logout:hover { background: rgba(239,68,68,0.3); }
+        .filters-bar {
+            padding: 15px 30px; display: flex;
+            gap: 10px; align-items: center; flex-wrap: wrap;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+        }
+        .filters-bar label { color: rgba(255,255,255,0.6); font-size: 13px; }
+        .filters-bar input[type="date"],
+        .filters-bar select {
+            padding: 8px 12px; background: rgba(255,255,255,0.08);
+            border: 1px solid rgba(255,255,255,0.15);
+            border-radius: 8px; color: #fff; font-size: 14px;
+        }
+        .filters-bar select option { color: #000; }
+        .filter-btn {
+            padding: 8px 16px; background: #f59e0b; color: #000;
+            border: none; border-radius: 8px; cursor: pointer;
+            font-weight: 600; font-size: 13px;
+        }
+        .quick-filters { display: flex; gap: 8px; margin-left: 15px; }
+        .quick-filters button {
+            padding: 6px 14px; background: rgba(255,255,255,0.08);
+            border: 1px solid rgba(255,255,255,0.15);
+            color: #fff; border-radius: 8px;
+            cursor: pointer; font-size: 12px;
+        }
+        .quick-filters button:hover,
+        .quick-filters button.active {
+            background: rgba(245,158,11,0.2);
+            border-color: #f59e0b; color: #f59e0b;
+        }
+        .main { padding: 20px 30px; }
+        .kpi-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 15px; margin-bottom: 25px;
+        }
+        .kpi-card {
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 14px; padding: 18px; text-align: center;
+        }
+        .kpi-card:hover { transform: translateY(-3px); transition: 0.3s; }
+        .kpi-card .kpi-value {
+            font-size: 28px; font-weight: 700;
+            color: #fff; margin-bottom: 4px;
+        }
+        .kpi-card .kpi-label {
+            font-size: 11px; color: rgba(255,255,255,0.5);
+            text-transform: uppercase; letter-spacing: 1px;
+        }
+        .kpi-card.highlight { border-color: rgba(245,158,11,0.3); }
+        .kpi-card.highlight .kpi-value { color: #f59e0b; }
+        .charts-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(450px, 1fr));
+            gap: 20px; margin-bottom: 25px;
+        }
+        .chart-card {
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 14px; padding: 20px;
+        }
+        .chart-card h3 {
+            font-size: 15px; color: rgba(255,255,255,0.8);
+            margin-bottom: 15px;
+        }
+        .chart-card canvas { max-height: 300px; }
+        .table-card {
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 14px; padding: 20px; overflow-x: auto;
+        }
+        .table-card h3 {
+            font-size: 15px; color: rgba(255,255,255,0.8);
+            margin-bottom: 15px;
+        }
+        table { width: 100%; border-collapse: collapse; }
+        th {
+            text-align: left; padding: 10px 12px;
+            background: rgba(255,255,255,0.05);
+            color: rgba(255,255,255,0.6); font-size: 12px;
+            text-transform: uppercase; letter-spacing: 0.5px;
+        }
+        td {
+            padding: 10px 12px;
+            border-top: 1px solid rgba(255,255,255,0.05);
+            font-size: 14px;
+        }
+        tr:hover { background: rgba(255,255,255,0.03); }
+        .status-badge {
+            padding: 3px 10px; border-radius: 20px;
+            font-size: 12px; font-weight: 600;
+        }
+        .status-high { background: rgba(34,197,94,0.15); color: #22c55e; }
+        .status-mid { background: rgba(245,158,11,0.15); color: #f59e0b; }
+        .status-low { background: rgba(239,68,68,0.15); color: #ef4444; }
+
+        /* ===== NEW: Employee Detail Modal Styles ===== */
+        #empDetailOverlay {
+            display: none; position: fixed; top: 0; left: 0;
+            width: 100%; height: 100%; background: rgba(0,0,0,0.7);
+            z-index: 99999; backdrop-filter: blur(8px);
+            align-items: center; justify-content: center;
+        }
+        #empDetailOverlay.active { display: flex !important; }
+        @keyframes modalSlideUp {
+            0% { opacity: 0; transform: translateY(40px); }
+            100% { opacity: 1; transform: translateY(0); }
+        }
+        .emp-modal {
+            background: rgba(15,23,42,0.98); border: 1px solid rgba(245,158,11,0.3);
+            border-radius: 20px; padding: 30px; width: 90%; max-width: 850px;
+            max-height: 85vh; overflow-y: auto;
+            box-shadow: 0 25px 60px rgba(0,0,0,0.5);
+            animation: modalSlideUp 0.4s ease-out;
+        }
+        .emp-modal::-webkit-scrollbar { width: 6px; }
+        .emp-modal::-webkit-scrollbar-track { background: transparent; }
+        .emp-modal::-webkit-scrollbar-thumb { background: rgba(245,158,11,0.3); border-radius: 3px; }
+
+        @media (max-width: 768px) {
+            .charts-grid { grid-template-columns: 1fr; }
+            .kpi-grid { grid-template-columns: repeat(2, 1fr); }
+            .navbar { padding: 12px 15px; }
+            .main { padding: 15px; }
+            .emp-modal { width: 95%; padding: 20px; }
+        }
     </style>
 </head>
 <body>
-
-    <!-- NAVBAR -->
     <nav class="navbar">
-        <div class="nav-brand">
-            <span>⚡</span>
-            <span class="title"><span class="stark">Stark</span> Dashboard</span>
-            <span class="badge">MANAGER</span>
-        </div>
+        <h1>&#9889; <span>Stark</span> Dashboard <span class="badge">MANAGER</span></h1>
         <div class="nav-right">
-            <span class="welcome">Welcome, <strong id="userName">Loading...</strong></span>
-            <button class="btn-signout" id="signOutBtn">Sign Out</button>
+            <div class="user-info">
+                Welcome, <strong id="userName">Loading...</strong>
+            </div>
+            <button class="btn-logout" onclick="handleLogout()">Sign Out</button>
         </div>
     </nav>
 
-    <div class="container">
-
-        <!-- FILTERS -->
-        <div class="filters">
-            <label>Team:</label>
-            <select id="teamFilter">
-                <option value="all">All Teams</option>
-                <option value="TeamA">Team A</option>
-                <option value="TeamB">Team B</option>
-                <option value="TeamC">Team C</option>
-            </select>
-            <label>From:</label>
-            <input type="date" id="startDate">
-            <label>To:</label>
-            <input type="date" id="endDate">
-            <button class="btn-filter btn-primary" onclick="applyFilters()">Apply</button>
-            <button class="btn-filter btn-secondary" onclick="setQuickFilter('today')">Today</button>
-            <button class="btn-filter btn-secondary" onclick="setQuickFilter('week')">This Week</button>
-            <button class="btn-filter btn-secondary" onclick="setQuickFilter('month')">This Month</button>
-            <button class="btn-filter btn-secondary" onclick="setQuickFilter('year')">This Year</button>
+    <div class="filters-bar">
+        <label>Team:</label>
+        <select id="teamFilter">
+            <option value="all">All Teams</option>
+            <option value="TeamA">Team A</option>
+            <option value="TeamB">Team B</option>
+            <option value="TeamC">Team C</option>
+        </select>
+        <label>From:</label>
+        <input type="date" id="startDate">
+        <label>To:</label>
+        <input type="date" id="endDate">
+        <button class="filter-btn" onclick="loadTeamData()">Apply</button>
+        <div class="quick-filters">
+            <button onclick="setQuickFilter('today')" class="active">Today</button>
+            <button onclick="setQuickFilter('week')">This Week</button>
+            <button onclick="setQuickFilter('month')">This Month</button>
         </div>
+    </div>
 
-        <!-- KPI CARDS -->
+
+    <div class="main">
         <div class="kpi-grid">
-            <div class="kpi-card">
+            <div class="kpi-card highlight">
+                <div class="kpi-value" id="kpiTeamProd">--</div>
                 <div class="kpi-label">Team Avg Productivity</div>
-                <div class="kpi-value" id="kpiProductivity">--</div>
             </div>
             <div class="kpi-card">
+                <div class="kpi-value" id="kpiTotalTasks">--</div>
                 <div class="kpi-label">Total Tasks</div>
-                <div class="kpi-value" id="kpiTasks" style="color:#3b82f6;">--</div>
             </div>
             <div class="kpi-card">
+                <div class="kpi-value" id="kpiActiveMembers">--</div>
                 <div class="kpi-label">Active Members</div>
-                <div class="kpi-value" id="kpiMembers" style="color:#22c55e;">--</div>
             </div>
             <div class="kpi-card">
-                <div class="kpi-label">Avg Session Time</div>
-                <div class="kpi-value" id="kpiSession" style="color:#8b5cf6;">--</div>
+                <div class="kpi-value" id="kpiAvgSession">--</div>
+                <div class="kpi-label">Avg Session (min)</div>
             </div>
             <div class="kpi-card">
+                <div class="kpi-value" id="kpiTopPerformer">--</div>
                 <div class="kpi-label">Top Performer</div>
-                <div class="kpi-value" id="kpiTopPerformer" style="color:#22c55e;font-size:16px;">--</div>
             </div>
             <div class="kpi-card">
-                <div class="kpi-label">Total Leakage</div>
-                <div class="kpi-value" id="kpiLeakage" style="color:#ef4444;">--</div>
+                <div class="kpi-value" id="kpiTotalLeakage">--</div>
+                <div class="kpi-label">Total Leakage (min)</div>
             </div>
         </div>
 
-        <!-- CHARTS -->
         <div class="charts-grid">
             <div class="chart-card">
-                <h3>Team Productivity Comparison</h3>
-                <canvas id="teamCompChart"></canvas>
+                <h3>&#128202; Team Productivity Comparison</h3>
+                <canvas id="teamCompareChart"></canvas>
             </div>
             <div class="chart-card">
-                <h3>Team Productivity Trend</h3>
+                <h3>&#128200; Team Productivity Trend</h3>
                 <canvas id="teamTrendChart"></canvas>
             </div>
             <div class="chart-card">
-                <h3>Employee Ranking</h3>
+                <h3>&#127942; Employee Ranking (by Productivity)</h3>
                 <canvas id="rankingChart"></canvas>
             </div>
             <div class="chart-card">
-                <h3>Time Distribution</h3>
+                <h3>&#9201; Time Distribution (Team Average)</h3>
                 <canvas id="timeDistChart"></canvas>
             </div>
         </div>
 
-        <!-- EMPLOYEE TABLE -->
-        <div class="table-section">
-            <h3>Employee Details (Click name for full breakdown)</h3>
-            <div style="overflow-x:auto;">
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Employee</th>
-                            <th style="text-align:center;">Avg Session</th>
-                            <th style="text-align:center;">Total Tasks</th>
-                            <th style="text-align:center;">Avg Productivity</th>
-                            <th style="text-align:center;">Status</th>
-                        </tr>
-                    </thead>
-                    <tbody id="employeeTableBody">
-                        <tr><td colspan="5" class="loading">Loading data...</td></tr>
-                    </tbody>
-                </table>
-            </div>
+        <div class="table-card">
+            <h3>&#128101; Employee Details (Click name for full breakdown)</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Employee</th>
+                        <th>Team</th>
+                        <th>Productivity</th>
+                        <th>Tasks</th>
+                        <th>Session Time</th>
+                        <th>Break Time</th>
+                        <th>Leakage</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody id="employeeTableBody">
+                    <tr><td colspan="8" style="text-align:center;padding:40px;color:rgba(255,255,255,0.4);">Loading team data...</td></tr>
+                </tbody>
+            </table>
         </div>
     </div>
-    <!-- ===== EMPLOYEE DETAIL MODAL ===== -->
-    <div id="empDetailOverlay">
-        <div id="empDetailModal" style="background:rgba(15,23,42,0.98);border:1px solid rgba(245,158,11,0.3);
-            border-radius:20px;padding:30px;width:90%;max-width:800px;max-height:85vh;overflow-y:auto;
-            box-shadow:0 25px 60px rgba(0,0,0,0.5);animation:slideUp 0.4s ease-out;">
 
+    <!-- ===== NEW: EMPLOYEE DETAIL MODAL ===== -->
+    <div id="empDetailOverlay">
+        <div class="emp-modal">
+            <!-- Modal Header -->
             <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:25px;
                 border-bottom:1px solid rgba(255,255,255,0.1);padding-bottom:15px;">
                 <div>
@@ -185,9 +280,10 @@
                     <span id="empDetailRole" style="color:rgba(255,255,255,0.4);font-size:12px;margin-left:10px;"></span>
                 </div>
                 <button onclick="closeEmpDetail()" style="background:rgba(239,68,68,0.2);border:1px solid rgba(239,68,68,0.3);
-                    color:#ef4444;padding:8px 16px;border-radius:10px;cursor:pointer;font-size:14px;font-weight:600;">✕ Close</button>
+                    color:#ef4444;padding:8px 16px;border-radius:10px;cursor:pointer;font-size:14px;font-weight:600;">&#10005; Close</button>
             </div>
 
+            <!-- KPI Row 1: Productivity, Tasks, Session -->
             <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:15px;margin-bottom:20px;">
                 <div style="background:rgba(245,158,11,0.1);border:1px solid rgba(245,158,11,0.2);border-radius:12px;padding:15px;text-align:center;">
                     <div style="color:rgba(255,255,255,0.5);font-size:11px;text-transform:uppercase;letter-spacing:1px;margin-bottom:5px;">Productivity %</div>
@@ -203,6 +299,7 @@
                 </div>
             </div>
 
+            <!-- KPI Row 2: Break, Prod DT, Non-Prod DT, Leakage -->
             <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:15px;margin-bottom:20px;">
                 <div style="background:rgba(168,85,247,0.1);border:1px solid rgba(168,85,247,0.2);border-radius:12px;padding:15px;text-align:center;">
                     <div style="color:rgba(255,255,255,0.5);font-size:10px;text-transform:uppercase;letter-spacing:1px;margin-bottom:5px;">Break Time</div>
@@ -222,17 +319,20 @@
                 </div>
             </div>
 
+            <!-- 9-Hour Shift Breakdown Bar -->
             <div style="margin-bottom:20px;">
-                <div style="color:rgba(255,255,255,0.6);font-size:12px;margin-bottom:8px;font-weight:600;">9-Hour Shift Breakdown</div>
+                <div style="color:rgba(255,255,255,0.6);font-size:12px;margin-bottom:8px;font-weight:600;">9-Hour Shift Breakdown (540 min)</div>
                 <div id="empDetailShiftBar" style="display:flex;height:30px;border-radius:8px;overflow:hidden;border:1px solid rgba(255,255,255,0.1);"></div>
                 <div id="empDetailShiftLegend" style="display:flex;gap:15px;margin-top:8px;flex-wrap:wrap;"></div>
             </div>
 
+            <!-- Process Breakdown -->
             <div style="margin-bottom:20px;">
                 <div style="color:rgba(255,255,255,0.6);font-size:12px;margin-bottom:10px;font-weight:600;">Process Breakdown</div>
                 <div id="empDetailProcessList" style="display:grid;grid-template-columns:repeat(2,1fr);gap:8px;"></div>
             </div>
 
+            <!-- Daily History Table -->
             <div>
                 <div style="color:rgba(255,255,255,0.6);font-size:12px;margin-bottom:10px;font-weight:600;">Daily History (Selected Period)</div>
                 <div style="overflow-x:auto;">
@@ -255,18 +355,20 @@
             </div>
         </div>
     </div>
+    <!-- ===== END MODAL ===== -->
+
 
     <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-app.js";
-        import { getAuth, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-auth.js";
-        import { getFirestore, collection, query, where, orderBy, getDocs, getDoc, doc } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-firestore.js";
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-app.js";
+        import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-auth.js";
+        import { getFirestore, collection, query, where, orderBy, getDocs, doc, getDoc } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-firestore.js";
 
         var firebaseConfig = {
             apiKey: "AIzaSyBfQArXV1ufPc11kLZGkGygcx6y2wObUJs",
             authDomain: "productivity-suite-a0329.firebaseapp.com",
             projectId: "productivity-suite-a0329",
             storageBucket: "productivity-suite-a0329.firebasestorage.app",
-            messagingSenderId: [US_SOCIAL_SECURITY_NUMBER]6",
+            messagingSenderId: "373942539246",
             appId: "1:373942539246:web:c7875b5cec318683a674ff",
             measurementId: "G-CTBY459SLP"
         };
@@ -276,29 +378,8 @@
         var db = getFirestore(app);
         var currentUser = null;
         var userProfile = null;
+        var teamCompareChart, teamTrendChart, rankingChart, timeDistChart;
         var SHIFT_MINUTES = 540; // 9-hour shift
-
-        var teamCompChart = null, teamTrendChart = null, rankingChart = null, timeDistChart = null;
-
-        // Sign Out
-        document.getElementById('signOutBtn').addEventListener('click', function() {
-            signOut(auth).then(function() { window.location.href = 'index.html'; });
-        });
-
-        // Quick Filters
-        window.setQuickFilter = function(period) {
-            var today = new Date();
-            var start = new Date();
-            if (period === 'today') { start = today; }
-            else if (period === 'week') { start.setDate(today.getDate() - today.getDay()); }
-            else if (period === 'month') { start = new Date(today.getFullYear(), today.getMonth(), 1); }
-            else if (period === 'year') { start = new Date(today.getFullYear(), 0, 1); }
-            document.getElementById('startDate').value = start.toISOString().split('T');
-            document.getElementById('endDate').value = today.toISOString().split('T');
-            loadTeamData();
-        };
-
-        window.applyFilters = function() { loadTeamData(); };
 
         // ===== TIMEOUT PROTECTION =====
         var pageLoadTimeout = setTimeout(function() {
@@ -335,274 +416,492 @@
             } catch (error) {
                 console.error('[Stark] Auth/Profile error:', error);
                 clearTimeout(pageLoadTimeout);
-                alert('Error loading profile: ' + error.message + '
-
-You will be signed out.');
+                alert('Error loading profile: ' + error.message);
                 await signOut(auth);
                 window.location.href = 'index.html';
             }
         });
+
+        // ===== LOGOUT =====
+        window.handleLogout = async function() {
+            await signOut(auth);
+            window.location.href = 'index.html';
+        };
+
+        // ===== QUICK FILTERS =====
+        window.setQuickFilter = function(range) {
+            var today = new Date();
+            var start = new Date();
+            document.querySelectorAll('.quick-filters button').forEach(function(b) {
+                b.classList.remove('active');
+            });
+            event.target.classList.add('active');
+            switch(range) {
+                case 'today': start = today; break;
+                case 'week': start.setDate(today.getDate() - 7); break;
+                case 'month': start.setMonth(today.getMonth() - 1); break;
+            }
+            document.getElementById('startDate').value = start.toISOString().split('T');
+            document.getElementById('endDate').value = today.toISOString().split('T');
+            loadTeamData();
+        };
+
         // ===== LOAD TEAM DATA =====
-        async function loadTeamData() {
+        window.loadTeamData = async function() {
             var startDate = document.getElementById('startDate').value;
             var endDate = document.getElementById('endDate').value;
             var teamFilter = document.getElementById('teamFilter').value;
-            if (!startDate || !endDate) return;
-
             try {
                 var q;
                 if (teamFilter === 'all') {
-                    q = query(collection(db, "productivity"), where("date", ">=", startDate), where("date", "<=", endDate), orderBy("date", "desc"));
+                    q = query(
+                        collection(db, "productivity"),
+                        where("date", ">=", startDate),
+                        where("date", "<=", endDate),
+                        orderBy("date", "desc")
+                    );
                 } else {
-                    q = query(collection(db, "productivity"), where("team", "==", teamFilter), where("date", ">=", startDate), where("date", "<=", endDate), orderBy("date", "desc"));
+                    q = query(
+                        collection(db, "productivity"),
+                        where("team", "==", teamFilter),
+                        where("date", ">=", startDate),
+                        where("date", "<=", endDate),
+                        orderBy("date", "desc")
+                    );
                 }
                 var snapshot = await getDocs(q);
-
-                var employeeData = {};
-                var dateData = {};
-                var totalSession = 0, totalTasks = 0, totalBreak = 0, totalProdDT = 0, totalNonProdDT = 0, totalLeakage = 0;
-                var totalProductivity = 0, docCount = 0;
-
-                // Fetch all user profiles
-                var userProfiles = {};
-                var userSnap = await getDocs(collection(db, "user"));
-                userSnap.forEach(function(uDoc) { userProfiles[uDoc.id] = uDoc.data(); });
-
-                snapshot.forEach(function(docSnap) {
-                    var d = docSnap.data();
-                    var empId = d.userId || d.email || 'unknown';
-                    var sessionMin = parseInt(d.session_time) || 0;
-                    var breakMin = parseInt(d.break_time) || 0;
-                    var prodDT = parseInt(d.productive_downtime) || 0;
-                    var nonProdDT = parseInt(d.non_productive_downtime) || 0;
-                    var leakage = Math.max(0, SHIFT_MINUTES - sessionMin - breakMin - prodDT - nonProdDT);
-                    var prodPct = SHIFT_MINUTES > 0 ? Math.min(100, Math.round(((sessionMin + prodDT) / SHIFT_MINUTES) * 1000) / 10) : 0;
-                    var tasks = parseInt(d.tasks_completed) || 0;
-
-                    if (!employeeData[empId]) {
-                        employeeData[empId] = { sessions:[], tasks:0, productivity:[], breaks:0, prodDT:0, nonProdDT:0, leakage:0, email:d.email||'', days:0 };
-                    }
-                    employeeData[empId].sessions.push(sessionMin);
-                    employeeData[empId].tasks += tasks;
-                    employeeData[empId].productivity.push(prodPct);
-                    employeeData[empId].breaks += breakMin;
-                    employeeData[empId].prodDT += prodDT;
-                    employeeData[empId].nonProdDT += nonProdDT;
-                    employeeData[empId].leakage += leakage;
-                    employeeData[empId].days++;
-
-                    if (!dateData[d.date]) { dateData[d.date] = { productivity:[], tasks:0 }; }
-                    dateData[d.date].productivity.push(prodPct);
-                    dateData[d.date].tasks += tasks;
-
-                    totalSession += sessionMin; totalTasks += tasks; totalBreak += breakMin;
-                    totalProdDT += prodDT; totalNonProdDT += nonProdDT; totalLeakage += leakage;
-                    totalProductivity += prodPct; docCount++;
+                var records = [];
+                snapshot.forEach(function(d) {
+                    var data = d.data();
+                    data.id = d.id;
+                    records.push(data);
                 });
 
-                var memberCount = Object.keys(employeeData).length;
-                var avgProd = docCount > 0 ? Math.round((totalProductivity / docCount) * 10) / 10 : 0;
-                var avgSession = docCount > 0 ? Math.round(totalSession / docCount) : 0;
-                var avgLeakage = docCount > 0 ? Math.round(totalLeakage / docCount) : 0;
-
-                // Find top performer
-                var topName = '--'; var topProd = 0;
-                var empIds = Object.keys(employeeData);
-                for (var i = 0; i < empIds.length; i++) {
-                    var ed = employeeData[empIds[i]];
-                    var ep = ed.productivity.reduce(function(a,b){return a+b;},0) / ed.productivity.length;
-                    var userData = userProfiles[empIds[i]] || {};
-                    if (ep > topProd) { topProd = ep; topName = userData.name || ed.email || empIds[i]; }
-                }
-
-                // Update KPIs
-                document.getElementById('kpiProductivity').textContent = avgProd + '%';
-                document.getElementById('kpiProductivity').style.color = avgProd >= 85 ? '#22c55e' : avgProd >= 60 ? '#f59e0b' : '#ef4444';
-                document.getElementById('kpiTasks').textContent = totalTasks;
-                document.getElementById('kpiMembers').textContent = memberCount;
-                document.getElementById('kpiSession').textContent = avgSession + 'm';
-                document.getElementById('kpiTopPerformer').textContent = topName;
-                document.getElementById('kpiLeakage').textContent = avgLeakage + 'm';
-
-                // Build Employee Table
-                var tbody = document.getElementById('employeeTableBody');
-                tbody.innerHTML = '';
-                for (var e = 0; e < empIds.length; e++) {
-                    var empInfo = employeeData[empIds[e]];
-                    var userData = userProfiles[empIds[e]] || {};
-                    var name = userData.name || empInfo.email || 'Unknown';
-                    var empEmail = empInfo.email || '';
-                    var empUserId = empIds[e];
-                    var empAvgSession = Math.round(empInfo.sessions.reduce(function(a,b){return a+b;},0) / empInfo.sessions.length);
-                    var empAvgProd = Math.round((empInfo.productivity.reduce(function(a,b){return a+b;},0) / empInfo.productivity.length) * 10) / 10;
-                    var statusColor = empAvgProd >= 85 ? '#22c55e' : empAvgProd >= 60 ? '#f59e0b' : '#ef4444';
-                    var statusText = empAvgProd >= 85 ? 'Excellent' : empAvgProd >= 60 ? 'Good' : 'Needs Improvement';
-
-                    var row = document.createElement('tr');
-                    row.innerHTML =
-                        '<td style="padding:12px;color:#fff;">' +
-                            '<a href="#" onclick="openEmpDetail(\'' + empUserId + '\',\'' + name.replace(/'/g, "\\'") + '\',\'' + empEmail + '\');return false;" ' +
-                            'style="color:#f59e0b;text-decoration:none;font-weight:600;cursor:pointer;' +
-                            'transition:all 0.3s;border-bottom:1px dashed rgba(245,158,11,0.3);"' +
-                            ' onmouseover="this.style.color=\'#fbbf24\';this.style.borderBottomColor=\'#fbbf24\'"' +
-                            ' onmouseout="this.style.color=\'#f59e0b\';this.style.borderBottomColor=\'rgba(245,158,11,0.3)\'">' +
-                            name + ' &#128269;</a></td>' +
-                        '<td style="padding:12px;color:#e2e8f0;text-align:center;">' + empAvgSession + ' min</td>' +
-                        '<td style="padding:12px;color:#e2e8f0;text-align:center;">' + empInfo.tasks + '</td>' +
-                        '<td style="padding:12px;text-align:center;">' +
-                            '<span style="background:' + statusColor + ';color:#000;padding:4px 10px;' +
-                            'border-radius:6px;font-weight:600;font-size:11px;">' + empAvgProd + '%</span></td>' +
-                        '<td style="padding:12px;text-align:center;">' +
-                            '<span style="background:rgba(255,255,255,0.06);color:' + statusColor + ';padding:4px 10px;' +
-                            'border-radius:6px;font-size:11px;font-weight:600;">' + statusText + '</span></td>';
-                    tbody.appendChild(row);
-                }
-                if (empIds.length === 0) {
-                    tbody.innerHTML = '<tr><td colspan="5" class="loading">No data found for selected period</td></tr>';
-                }
-
-                // ===== CHARTS =====
-                var chartColors = ['#f59e0b','#3b82f6','#22c55e','#ef4444',[MAC_ADDRESS]6',[MAC_ADDRESS]9',[MAC_ADDRESS]6',[MAC_ADDRESS]6'];
-
-                // Team Comparison Chart
-                var compLabels = []; var compData = [];
-                for (var c = 0; c < empIds.length; c++) {
-                    var cData = employeeData[empIds[c]];
-                    var cProfile = userProfiles[empIds[c]] || {};
-                    compLabels.push(cProfile.name || cData.email || 'Unknown');
-                    compData.push(Math.round((cData.productivity.reduce(function(a,b){return a+b;},0) / cData.productivity.length) * 10) / 10);
-                }
-                if (teamCompChart) teamCompChart.destroy();
-                teamCompChart = new Chart(document.getElementById('teamCompChart'), {
-                    type:'bar', data:{ labels:compLabels, datasets:[{ label:'Productivity %', data:compData,
-                        backgroundColor:chartColors.slice(0, compLabels.length), borderRadius:6 }] },
-                    options:{ responsive:true, plugins:{ legend:{display:false} },
-                        scales:{ y:{beginAtZero:true,max:100,ticks:{color:'rgba(255,255,255,0.4)'},grid:{color:'rgba(255,255,255,0.05)'}},
-                        x:{ticks:{color:'rgba(255,255,255,0.4)'},grid:{display:false}} } }
+                var usersSnap = await getDocs(collection(db, "user"));
+                var usersMap = {};
+                usersSnap.forEach(function(d) {
+                    usersMap[d.id] = d.data();
                 });
 
-                // Team Trend Chart
-                var dates = Object.keys(dateData).sort();
-                var trendAvgs = dates.map(function(dt) {
-                    var prods = dateData[dt].productivity;
-                    return Math.round((prods.reduce(function(a,b){return a+b;},0) / prods.length) * 10) / 10;
-                });
-                if (teamTrendChart) teamTrendChart.destroy();
-                teamTrendChart = new Chart(document.getElementById('teamTrendChart'), {
-                    type:'line', data:{ labels:dates, datasets:[{ label:'Team Avg Productivity', data:trendAvgs,
-                        borderColor:'#f59e0b', backgroundColor:'rgba(245,158,11,0.1)', fill:true, tension:0.4, pointRadius:4 }] },
-                    options:{ responsive:true, plugins:{ legend:{display:false} },
-                        scales:{ y:{beginAtZero:true,max:100,ticks:{color:'rgba(255,255,255,0.4)'},grid:{color:'rgba(255,255,255,0.05)'}},
-                        x:{ticks:{color:'rgba(255,255,255,0.4)'},grid:{display:false}} } }
-                });
-
-                // Ranking Chart
-                var rankData = [];
-                for (var r = 0; r < empIds.length; r++) {
-                    var rData = employeeData[empIds[r]];
-                    var rProfile = userProfiles[empIds[r]] || {};
-                    rankData.push({ name: rProfile.name || rData.email || 'Unknown',
-                        prod: Math.round((rData.productivity.reduce(function(a,b){return a+b;},0) / rData.productivity.length) * 10) / 10 });
-                }
-                rankData.sort(function(a,b) { return b.prod - a.prod; });
-                if (rankingChart) rankingChart.destroy();
-                rankingChart = new Chart(document.getElementById('rankingChart'), {
-                    type:'bar', data:{ labels:rankData.map(function(r){return r.name;}),
-                        datasets:[{ label:'Productivity %', data:rankData.map(function(r){return r.prod;}),
-                        backgroundColor:rankData.map(function(r){return r.prod>=85?'#22c55e':r.prod>=60?'#f59e0b':'#ef4444';}), borderRadius:6 }] },
-                    options:{ indexAxis:'y', responsive:true, plugins:{ legend:{display:false} },
-                        scales:{ x:{beginAtZero:true,max:100,ticks:{color:'rgba(255,255,255,0.4)'},grid:{color:'rgba(255,255,255,0.05)'}},
-                        y:{ticks:{color:'rgba(255,255,255,0.4)'},grid:{display:false}} } }
-                });
-
-                // Time Distribution Chart
-                var avgBreakAll = docCount > 0 ? Math.round(totalBreak / docCount) : 0;
-                var avgProdDTAll = docCount > 0 ? Math.round(totalProdDT / docCount) : 0;
-                var avgNonProdDTAll = docCount > 0 ? Math.round(totalNonProdDT / docCount) : 0;
-                if (timeDistChart) timeDistChart.destroy();
-                timeDistChart = new Chart(document.getElementById('timeDistChart'), {
-                    type:'doughnut', data:{ labels:['Session','Break','Productive DT','Non-Productive DT','Leakage'],
-                        datasets:[{ data:[avgSession, avgBreakAll, avgProdDTAll, avgNonProdDTAll, avgLeakage],
-                        backgroundColor:['#3b82f6','#a855f7','#22c55e',[MAC_ADDRESS]6','#ef4444'], borderWidth:0 }] },
-                    options:{ responsive:true, plugins:{ legend:{ position:'bottom', labels:{color:'rgba(255,255,255,0.6)',padding:12,font:{size:11}} } } }
-                });
-
+                updateManagerKPIs(records, usersMap);
+                updateManagerCharts(records, usersMap);
+                updateEmployeeTable(records, usersMap);
             } catch (error) {
-                console.error('[Stark] Error loading team data:', error);
+                console.error('Error loading team data:', error);
                 document.getElementById('employeeTableBody').innerHTML =
-                    '<tr><td colspan="5" class="loading" style="color:#ef4444;">Error: ' + error.message + '</td></tr>';
+                    '<tr><td colspan="8" style="text-align:center;padding:40px;color:#ef4444;">Error: ' + error.message + '</td></tr>';
             }
+        };
+
+        // ===== UPDATE KPIs (with 9-hour leakage) =====
+        function updateManagerKPIs(records, usersMap) {
+            if (records.length === 0) {
+                var ids = ['kpiTeamProd','kpiTotalTasks','kpiActiveMembers','kpiAvgSession','kpiTopPerformer','kpiTotalLeakage'];
+                for (var i = 0; i < ids.length; i++) {
+                    document.getElementById(ids[i]).textContent = '--';
+                }
+                return;
+            }
+            var uniqueUsers = [];
+            var seen = {};
+            for (var i = 0; i < records.length; i++) {
+                if (!seen[records[i].userId]) {
+                    seen[records[i].userId] = true;
+                    uniqueUsers.push(records[i].userId);
+                }
+            }
+
+            var totalProd = 0, totalTasks = 0, totalSession = 0, totalLeakage = 0;
+            for (var i = 0; i < records.length; i++) {
+                var sessionMin = records[i].session_time || 0;
+                var breakMin = records[i].break_time || 0;
+                var prodDT = records[i].productive_downtime || 0;
+                var nonProdDT = records[i].non_productive_downtime || 0;
+                // Recalculate leakage from 9-hour shift
+                var leakage = Math.max(0, SHIFT_MINUTES - sessionMin - breakMin - prodDT - nonProdDT);
+
+                totalProd += (records[i].productivity_pct || 0);
+                totalTasks += (records[i].tasks_completed || 0);
+                totalSession += sessionMin;
+                totalLeakage += leakage;
+            }
+
+            document.getElementById('kpiTeamProd').textContent = (totalProd / records.length).toFixed(1) + '%';
+            document.getElementById('kpiTotalTasks').textContent = totalTasks;
+            document.getElementById('kpiActiveMembers').textContent = uniqueUsers.length;
+            document.getElementById('kpiAvgSession').textContent = Math.round(totalSession / records.length);
+            document.getElementById('kpiTotalLeakage').textContent = Math.round(totalLeakage / records.length) + 'm';
+
+            // Find top performer
+            var userProd = {};
+            for (var i = 0; i < records.length; i++) {
+                var uid = records[i].userId;
+                if (!userProd[uid]) { userProd[uid] = { total: 0, count: 0 }; }
+                userProd[uid].total += (records[i].productivity_pct || 0);
+                userProd[uid].count++;
+            }
+            var topUser = '--';
+            var topAvg = 0;
+            var keys = Object.keys(userProd);
+            for (var i = 0; i < keys.length; i++) {
+                var avg = userProd[keys[i]].total / userProd[keys[i]].count;
+                if (avg > topAvg) {
+                    topAvg = avg;
+                    topUser = usersMap[keys[i]] ? usersMap[keys[i]].name.split(' ') : keys[i].substring(0, 8);
+                }
+            }
+            document.getElementById('kpiTopPerformer').textContent = topUser;
+        }
+
+        // ===== UPDATE CHARTS =====
+        function updateManagerCharts(records, usersMap) {
+            // Group by user
+            var byUser = {};
+            for (var i = 0; i < records.length; i++) {
+                var name = usersMap[records[i].userId] ? usersMap[records[i].userId].name : 'Unknown';
+                if (!byUser[name]) byUser[name] = [];
+                byUser[name].push(records[i]);
+            }
+            var userNames = Object.keys(byUser);
+            var userAvgProd = [];
+            for (var i = 0; i < userNames.length; i++) {
+                var recs = byUser[userNames[i]];
+                var sum = 0;
+                for (var j = 0; j < recs.length; j++) { sum += (recs[j].productivity_pct || 0); }
+                userAvgProd.push(Math.round((sum / recs.length) * 10) / 10);
+            }
+
+            // Team Compare Bar Chart
+            if (teamCompareChart) teamCompareChart.destroy();
+            var barColors = [];
+            for (var i = 0; i < userAvgProd.length; i++) {
+                if (userAvgProd[i] >= 80) barColors.push('rgba(34,197,94,0.6)');
+                else if (userAvgProd[i] >= 60) barColors.push('rgba(245,158,11,0.6)');
+                else barColors.push('rgba(239,68,68,0.6)');
+            }
+            var shortNames = [];
+            for (var i = 0; i < userNames.length; i++) {
+                shortNames.push(userNames[i].split(' '));
+            }
+            teamCompareChart = new Chart(document.getElementById('teamCompareChart'), {
+                type: 'bar',
+                data: {
+                    labels: shortNames,
+                    datasets: [{
+                        label: 'Avg Productivity %',
+                        data: userAvgProd,
+                        backgroundColor: barColors,
+                        borderRadius: 6
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: { legend: { labels: { color: '#94a3b8' } } },
+                    scales: {
+                        x: { ticks: { color: '#64748b' }, grid: { color: 'rgba(255,255,255,0.05)' } },
+                        y: { ticks: { color: '#64748b' }, grid: { color: 'rgba(255,255,255,0.05)' }, min: 0, max: 100 }
+                    }
+                }
+            });
+
+            // Team Trend Line Chart
+            var byDate = {};
+            for (var i = 0; i < records.length; i++) {
+                if (!byDate[records[i].date]) byDate[records[i].date] = [];
+                byDate[records[i].date].push(records[i]);
+            }
+            var dates = Object.keys(byDate).sort();
+            var dateAvgs = [];
+            for (var i = 0; i < dates.length; i++) {
+                var recs = byDate[dates[i]];
+                var sum = 0;
+                for (var j = 0; j < recs.length; j++) { sum += (recs[j].productivity_pct || 0); }
+                dateAvgs.push(Math.round((sum / recs.length) * 10) / 10);
+            }
+
+            if (teamTrendChart) teamTrendChart.destroy();
+            teamTrendChart = new Chart(document.getElementById('teamTrendChart'), {
+                type: 'line',
+                data: {
+                    labels: dates,
+                    datasets: [{
+                        label: 'Team Avg Productivity %',
+                        data: dateAvgs,
+                        borderColor: '#f59e0b',
+                        backgroundColor: 'rgba(245,158,11,0.1)',
+                        fill: true, tension: 0.4,
+                        pointRadius: 4,
+                        pointBackgroundColor: '#f59e0b'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: { legend: { labels: { color: '#94a3b8' } } },
+                    scales: {
+                        x: { ticks: { color: '#64748b' }, grid: { color: 'rgba(255,255,255,0.05)' } },
+                        y: { ticks: { color: '#64748b' }, grid: { color: 'rgba(255,255,255,0.05)' }, min: 0, max: 100 }
+                    }
+                }
+            });
+
+            // Ranking Horizontal Bar
+            var sortedUsers = [];
+            for (var i = 0; i < userNames.length; i++) {
+                sortedUsers.push({ name: userNames[i], prod: userAvgProd[i] });
+            }
+            sortedUsers.sort(function(a, b) { return b.prod - a.prod; });
+            var rankNames = [];
+            var rankData = [];
+            var rankColors = [];
+            for (var i = 0; i < sortedUsers.length; i++) {
+                rankNames.push(sortedUsers[i].name.split(' '));
+                rankData.push(sortedUsers[i].prod);
+                rankColors.push(i === 0 ? 'rgba(245,158,11,0.8)' : 'rgba(59,130,246,0.6)');
+            }
+
+            if (rankingChart) rankingChart.destroy();
+            rankingChart = new Chart(document.getElementById('rankingChart'), {
+                type: 'bar',
+                data: {
+                    labels: rankNames,
+                    datasets: [{
+                        label: 'Productivity %',
+                        data: rankData,
+                        backgroundColor: rankColors,
+                        borderRadius: 6
+                    }]
+                },
+                options: {
+                    indexAxis: 'y', responsive: true,
+                    plugins: { legend: { labels: { color: '#94a3b8' } } },
+                    scales: {
+                        x: { ticks: { color: '#64748b' }, grid: { color: 'rgba(255,255,255,0.05)' }, min: 0, max: 100 },
+                        y: { ticks: { color: '#64748b' }, grid: { color: 'rgba(255,255,255,0.05)' } }
+                    }
+                }
+            });
+
+            // Time Distribution Doughnut (recalculated with 9-hour shift)
+            var totalSession = 0, totalBreak = 0, totalProdDT = 0, totalNonProdDT = 0, totalLeak = 0;
+            for (var i = 0; i < records.length; i++) {
+                var sMin = records[i].session_time || 0;
+                var bMin = records[i].break_time || 0;
+                var pDT = records[i].productive_downtime || 0;
+                var npDT = records[i].non_productive_downtime || 0;
+                totalSession += sMin;
+                totalBreak += bMin;
+                totalProdDT += pDT;
+                totalNonProdDT += npDT;
+                totalLeak += Math.max(0, SHIFT_MINUTES - sMin - bMin - pDT - npDT);
+            }
+
+            if (timeDistChart) timeDistChart.destroy();
+            timeDistChart = new Chart(document.getElementById('timeDistChart'), {
+                type: 'doughnut',
+                data: {
+                    labels: ['Session', 'Break', 'Productive DT', 'Non-Productive DT', 'Leakage'],
+                    datasets: [{
+                        data: [totalSession, totalBreak, totalProdDT, totalNonProdDT, totalLeak],
+                        backgroundColor: ['#f59e0b', '#3b82f6', '#22c55e', '#f97316', '#ef4444']
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: { legend: { position: 'bottom', labels: { color: '#94a3b8', padding: 15 } } }
+                }
+            });
+        }
+
+
+        // ===== UPDATE EMPLOYEE TABLE (with clickable names) =====
+        function updateEmployeeTable(records, usersMap) {
+            var tbody = document.getElementById('employeeTableBody');
+            if (records.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;padding:40px;color:rgba(255,255,255,0.4);">No team data found for this date range.</td></tr>';
+                return;
+            }
+            var byUser = {};
+            for (var i = 0; i < records.length; i++) {
+                var uid = records[i].userId;
+                if (!byUser[uid]) {
+                    byUser[uid] = {
+                        userId: uid,
+                        name: usersMap[uid] ? usersMap[uid].name : 'Unknown',
+                        email: records[i].email || (usersMap[uid] ? usersMap[uid].email : ''),
+                        team: records[i].team || (usersMap[uid] ? usersMap[uid].team : '--'),
+                        totalProd: 0, count: 0,
+                        totalTasks: 0, totalSession: 0,
+                        totalBreak: 0, totalLeakage: 0
+                    };
+                }
+                var sessionMin = records[i].session_time || 0;
+                var breakMin = records[i].break_time || 0;
+                var prodDT = records[i].productive_downtime || 0;
+                var nonProdDT = records[i].non_productive_downtime || 0;
+                var leakage = Math.max(0, SHIFT_MINUTES - sessionMin - breakMin - prodDT - nonProdDT);
+
+                byUser[uid].totalProd += (records[i].productivity_pct || 0);
+                byUser[uid].count++;
+                byUser[uid].totalTasks += (records[i].tasks_completed || 0);
+                byUser[uid].totalSession += sessionMin;
+                byUser[uid].totalBreak += breakMin;
+                byUser[uid].totalLeakage += leakage;
+            }
+
+            var rows = Object.values(byUser);
+            rows.sort(function(a, b) {
+                return (b.totalProd / b.count) - (a.totalProd / a.count);
+            });
+
+            var html = '';
+            for (var i = 0; i < rows.length; i++) {
+                var r = rows[i];
+                var avgProd = (r.totalProd / r.count).toFixed(1);
+                var statusClass, statusText;
+                if (avgProd >= 80) { statusClass = 'status-high'; statusText = 'Excellent'; }
+                else if (avgProd >= 60) { statusClass = 'status-mid'; statusText = 'Good'; }
+                else { statusClass = 'status-low'; statusText = 'Needs Improvement'; }
+                var prodColor = avgProd >= 80 ? '[MAC_ADDRESS]e' : avgProd >= 60 ? '#f59e0b' : '#ef4444';
+
+                var safeName = r.name.replace(/'/g, "\\'");
+                var safeEmail = r.email.replace(/'/g, "\\'");
+
+                html += '<tr>';
+                html += '<td><a href="#" onclick="openEmpDetail(\'' + r.userId + '\',\'' + safeName + '\',\'' + safeEmail + '\');return false;" ';
+                html += 'style="color:#f59e0b;text-decoration:none;font-weight:600;cursor:pointer;';
+                html += 'border-bottom:1px dashed rgba(245,158,11,0.3);transition:all 0.3s;" ';
+                html += 'onmouseover="this.style.color=\'#fbbf24\'" onmouseout="this.style.color=\'#f59e0b\'">';
+                html += r.name + ' &#128269;</a></td>';
+                html += '<td>' + r.team + '</td>';
+                html += '<td style="color:' + prodColor + ';font-weight:600;">' + avgProd + '%</td>';
+                html += '<td>' + r.totalTasks + '</td>';
+                html += '<td>' + Math.round(r.totalSession / r.count) + ' min</td>';
+                html += '<td>' + Math.round(r.totalBreak / r.count) + ' min</td>';
+                html += '<td style="color:' + (Math.round(r.totalLeakage / r.count) > 60 ? '#ef4444' : '#f59e0b') + ';">' + Math.round(r.totalLeakage / r.count) + ' min</td>';
+                html += '<td><span class="status-badge ' + statusClass + '">' + statusText + '</span></td>';
+                html += '</tr>';
+            }
+            tbody.innerHTML = html;
         }
 
         // ===== EMPLOYEE DETAIL MODAL =====
         window.openEmpDetail = async function(empUserId, empName, empEmail) {
             var overlay = document.getElementById('empDetailOverlay');
             overlay.classList.add('active');
+
+            // Set header
             document.getElementById('empDetailName').textContent = empName;
             document.getElementById('empDetailTeam').textContent = empEmail;
             document.getElementById('empDetailRole').textContent = '';
 
+            // Reset all fields to loading state
+            var resetIds = ['empDetailProductivity','empDetailTasks','empDetailSession',
+                'empDetailBreak','empDetailProdDT','empDetailNonProdDT','empDetailLeakage'];
+            for (var r = 0; r < resetIds.length; r++) {
+                document.getElementById(resetIds[r]).textContent = '...';
+            }
+            document.getElementById('empDetailShiftBar').innerHTML = '';
+            document.getElementById('empDetailShiftLegend').innerHTML = '';
+            document.getElementById('empDetailProcessList').innerHTML = '<div style="color:rgba(255,255,255,0.3);padding:10px;">Loading...</div>';
+            document.getElementById('empDetailHistoryBody').innerHTML = '<tr><td colspan="8" style="padding:15px;color:rgba(255,255,255,0.3);text-align:center;">Loading...</td></tr>';
+
+            // Fetch user profile for team/role
             try {
-                var userSnap = await getDocs(collection(db, "user"));
-                userSnap.forEach(function(uDoc) {
+                var usersSnap = await getDocs(collection(db, "user"));
+                usersSnap.forEach(function(uDoc) {
                     var uData = uDoc.data();
-                    if (uData.email === empEmail) {
+                    if (uDoc.id === empUserId || uData.email === empEmail) {
                         document.getElementById('empDetailTeam').textContent = (uData.team || 'No Team');
-                        document.getElementById('empDetailRole').textContent = '• ' + (uData.role || 'employee');
+                        document.getElementById('empDetailRole').textContent = '&#8226; ' + (uData.role || 'employee');
                     }
                 });
-            } catch (e) { console.warn('[Stark] Could not fetch user profile:', e); }
+            } catch (e) {
+                console.warn('[Stark] Could not fetch user profile:', e);
+            }
 
+            // Get date range from filters
             var startDate = document.getElementById('startDate').value;
             var endDate = document.getElementById('endDate').value;
             if (!startDate || !endDate) {
                 var today = new Date().toISOString().split('T');
-                startDate = today; endDate = today;
+                startDate = today;
+                endDate = today;
             }
 
+            // Fetch productivity data for this employee
             try {
-                var q = query(collection(db, "productivity"), where("userId", "==", empUserId),
-                    where("date", ">=", startDate), where("date", "<=", endDate), orderBy("date", "desc"));
+                var q = query(
+                    collection(db, "productivity"),
+                    where("userId", "==", empUserId),
+                    where("date", ">=", startDate),
+                    where("date", "<=", endDate),
+                    orderBy("date", "desc")
+                );
                 var snapshot = await getDocs(q);
 
-                var totalSession=0, totalTasks=0, totalBreak=0, totalProdDT=0, totalNonProdDT=0, totalLeakage=0;
-                var totalProductivity=0, dayCount=0;
+                var totalSession = 0, totalTasks = 0, totalBreak = 0;
+                var totalProdDT = 0, totalNonProdDT = 0, totalLeakage = 0;
+                var totalProductivity = 0, dayCount = 0;
                 var allProcesses = {};
                 var dailyRecords = [];
 
                 snapshot.forEach(function(docSnap) {
                     var d = docSnap.data();
-                    var sessionMin = parseInt(d.session_time)||0;
-                    var breakMin = parseInt(d.break_time)||0;
-                    var prodDT = parseInt(d.productive_downtime)||0;
-                    var nonProdDT = parseInt(d.non_productive_downtime)||0;
+                    var sessionMin = parseInt(d.session_time) || 0;
+                    var breakMin = parseInt(d.break_time) || 0;
+                    var prodDT = parseInt(d.productive_downtime) || 0;
+                    var nonProdDT = parseInt(d.non_productive_downtime) || 0;
+
+                    // Recalculate leakage from 9-hour shift
                     var leakage = Math.max(0, SHIFT_MINUTES - sessionMin - breakMin - prodDT - nonProdDT);
-                    var prodPct = SHIFT_MINUTES > 0 ? Math.min(100, Math.round(((sessionMin + prodDT) / SHIFT_MINUTES) * 1000) / 10) : 0;
 
-                    totalSession += sessionMin; totalTasks += (parseInt(d.tasks_completed)||0);
-                    totalBreak += breakMin; totalProdDT += prodDT; totalNonProdDT += nonProdDT;
-                    totalLeakage += leakage; totalProductivity += prodPct; dayCount++;
+                    // Recalculate productivity from 9-hour shift
+                    var prodPct = 0;
+                    if (SHIFT_MINUTES > 0) {
+                        prodPct = Math.min(100, Math.round(((sessionMin + prodDT) / SHIFT_MINUTES) * 1000) / 10);
+                    }
 
+                    totalSession += sessionMin;
+                    totalTasks += (parseInt(d.tasks_completed) || 0);
+                    totalBreak += breakMin;
+                    totalProdDT += prodDT;
+                    totalNonProdDT += nonProdDT;
+                    totalLeakage += leakage;
+                    totalProductivity += prodPct;
+                    dayCount++;
+
+                    // Collect process breakdown
                     if (d.process_breakdown && typeof d.process_breakdown === 'object') {
                         var pKeys = Object.keys(d.process_breakdown);
                         for (var i = 0; i < pKeys.length; i++) {
                             if (!allProcesses[pKeys[i]]) allProcesses[pKeys[i]] = 0;
-                            allProcesses[pKeys[i]] += (parseInt(d.process_breakdown[pKeys[i]])||0);
+                            allProcesses[pKeys[i]] += (parseInt(d.process_breakdown[pKeys[i]]) || 0);
                         }
                     }
-                    dailyRecords.push({ date:d.date, session:sessionMin, tasks:parseInt(d.tasks_completed)||0,
-                        productivity:prodPct, breakTime:breakMin, prodDT:prodDT, nonProdDT:nonProdDT, leakage:leakage });
+
+                    dailyRecords.push({
+                        date: d.date,
+                        session: sessionMin,
+                        tasks: parseInt(d.tasks_completed) || 0,
+                        productivity: prodPct,
+                        breakTime: breakMin,
+                        prodDT: prodDT,
+                        nonProdDT: nonProdDT,
+                        leakage: leakage
+                    });
                 });
 
-                var avgProd = dayCount > 0 ? Math.round((totalProductivity/dayCount)*10)/10 : 0;
-                var avgSession = dayCount > 0 ? Math.round(totalSession/dayCount) : 0;
-                var avgBreak = dayCount > 0 ? Math.round(totalBreak/dayCount) : 0;
-                var avgProdDT = dayCount > 0 ? Math.round(totalProdDT/dayCount) : 0;
-                var avgNonProdDT = dayCount > 0 ? Math.round(totalNonProdDT/dayCount) : 0;
-                var avgLeak = dayCount > 0 ? Math.round(totalLeakage/dayCount) : 0;
+                // ===== Populate KPI Cards =====
+                var avgProd = dayCount > 0 ? Math.round((totalProductivity / dayCount) * 10) / 10 : 0;
+                var avgSession = dayCount > 0 ? Math.round(totalSession / dayCount) : 0;
+                var avgBreak = dayCount > 0 ? Math.round(totalBreak / dayCount) : 0;
+                var avgProdDT = dayCount > 0 ? Math.round(totalProdDT / dayCount) : 0;
+                var avgNonProdDT = dayCount > 0 ? Math.round(totalNonProdDT / dayCount) : 0;
+                var avgLeak = dayCount > 0 ? Math.round(totalLeakage / dayCount) : 0;
 
                 document.getElementById('empDetailProductivity').textContent = avgProd + '%';
-                document.getElementById('empDetailProductivity').style.color = avgProd >= 85 ? '#22c55e' : avgProd >= 60 ? '#f59e0b' : '#ef4444';
+                document.getElementById('empDetailProductivity').style.color =
+                    avgProd >= 85 ? '[MAC_ADDRESS]e' : avgProd >= 60 ? '#f59e0b' : '#ef4444';
                 document.getElementById('empDetailTasks').textContent = totalTasks;
                 document.getElementById('empDetailSession').textContent = avgSession + ' min';
                 document.getElementById('empDetailBreak').textContent = avgBreak + ' min';
@@ -610,71 +909,85 @@ You will be signed out.');
                 document.getElementById('empDetailNonProdDT').textContent = avgNonProdDT + ' min';
                 document.getElementById('empDetailLeakage').textContent = avgLeak + ' min';
 
-                var sessionPct = (avgSession/SHIFT_MINUTES*100).toFixed(1);
-                var breakPct = (avgBreak/SHIFT_MINUTES*100).toFixed(1);
-                var prodDTPct = (avgProdDT/SHIFT_MINUTES*100).toFixed(1);
-                var nonProdDTPct = (avgNonProdDT/SHIFT_MINUTES*100).toFixed(1);
-                var leakPct = (avgLeak/SHIFT_MINUTES*100).toFixed(1);
+                // ===== 9-Hour Shift Breakdown Bar =====
+                var sessionPct = (avgSession / SHIFT_MINUTES * 100).toFixed(1);
+                var breakPct = (avgBreak / SHIFT_MINUTES * 100).toFixed(1);
+                var prodDTPct = (avgProdDT / SHIFT_MINUTES * 100).toFixed(1);
+                var nonProdDTPct = (avgNonProdDT / SHIFT_MINUTES * 100).toFixed(1);
+                var leakPct = (avgLeak / SHIFT_MINUTES * 100).toFixed(1);
 
                 document.getElementById('empDetailShiftBar').innerHTML =
-                    '<div style="width:'+sessionPct+'%;background:#3b82f6;" title="Session: '+avgSession+' min"></div>' +
-                    '<div style="width:'+breakPct+'%;background:#a855f7;" title="Break: '+avgBreak+' min"></div>' +
-                    '<div style="width:'+prodDTPct+'%;background:#22c55e;" title="Productive DT: '+avgProdDT+' min"></div>' +
-                    '<div style="width:'+nonProdDTPct+'%;background:#f97316;" title="Non-Prod DT: '+avgNonProdDT+' min"></div>' +
-                    '<div style="width:'+leakPct+'%;background:#ef4444;" title="Leakage: '+avgLeak+' min"></div>';
+                    '<div style="width:' + sessionPct + '%;background:#3b82f6;" title="Session: ' + avgSession + ' min (' + sessionPct + '%)"></div>' +
+                    '<div style="width:' + breakPct + '%;background:#a855f7;" title="Break: ' + avgBreak + ' min (' + breakPct + '%)"></div>' +
+                    '<div style="width:' + prodDTPct + '%;background:[MAC_ADDRESS]e;" title="Productive DT: ' + avgProdDT + ' min (' + prodDTPct + '%)"></div>' +
+                    '<div style="width:' + nonProdDTPct + '%;background:#f97316;" title="Non-Prod DT: ' + avgNonProdDT + ' min (' + nonProdDTPct + '%)"></div>' +
+                    '<div style="width:' + leakPct + '%;background:#ef4444;" title="Leakage: ' + avgLeak + ' min (' + leakPct + '%)"></div>';
 
                 document.getElementById('empDetailShiftLegend').innerHTML =
-                    '<span style="color:#3b82f6;font-size:11px;">&#9679; Session '+sessionPct+'%</span>' +
-                    '<span style="color:#a855f7;font-size:11px;">&#9679; Break '+breakPct+'%</span>' +
-                    '<span style="color:#22c55e;font-size:11px;">&#9679; Prod DT '+prodDTPct+'%</span>' +
-                    '<span style="color:#f97316;font-size:11px;">&#9679; Non-Prod '+nonProdDTPct+'%</span>' +
-                    '<span style="color:#ef4444;font-size:11px;">&#9679; Leakage '+leakPct+'%</span>';
+                    '<span style="color:#3b82f6;font-size:11px;">&#9679; Session ' + sessionPct + '%</span>' +
+                    '<span style="color:#a855f7;font-size:11px;">&#9679; Break ' + breakPct + '%</span>' +
+                    '<span style="color:[MAC_ADDRESS]e;font-size:11px;">&#9679; Prod DT ' + prodDTPct + '%</span>' +
+                    '<span style="color:#f97316;font-size:11px;">&#9679; Non-Prod ' + nonProdDTPct + '%</span>' +
+                    '<span style="color:#ef4444;font-size:11px;">&#9679; Leakage ' + leakPct + '%</span>';
 
-                var processColors = ['#f59e0b','#3b82f6','#22c55e','#ef4444',[MAC_ADDRESS]6',[MAC_ADDRESS]9',[MAC_ADDRESS]6',[MAC_ADDRESS]6'];
-                var pKeys = Object.keys(allProcesses).sort(function(a,b){return allProcesses[b]-allProcesses[a];});
+                // ===== Process Breakdown =====
+                var processColors = ['#f59e0b', '#3b82f6', '[MAC_ADDRESS]e', '#ef4444', '#8b5cf6', '#ec4899', '#14b8a6', '#f97316'];
+                var pKeys = Object.keys(allProcesses).sort(function(a, b) { return allProcesses[b] - allProcesses[a]; });
                 var processHtml = '';
                 for (var p = 0; p < pKeys.length; p++) {
                     var pColor = processColors[p % processColors.length];
                     processHtml += '<div style="background:rgba(255,255,255,0.05);border-radius:8px;padding:10px 12px;' +
                         'display:flex;justify-content:space-between;align-items:center;">' +
-                        '<span style="color:'+pColor+';font-size:12px;font-weight:600;">&#9679; '+pKeys[p]+'</span>' +
-                        '<span style="color:#fff;font-size:14px;font-weight:700;">'+allProcesses[pKeys[p]]+'</span></div>';
+                        '<span style="color:' + pColor + ';font-size:12px;font-weight:600;">&#9679; ' + pKeys[p] + '</span>' +
+                        '<span style="color:#fff;font-size:14px;font-weight:700;">' + allProcesses[pKeys[p]] + '</span></div>';
                 }
-                if (pKeys.length === 0) processHtml = '<div style="color:rgba(255,255,255,0.3);font-size:12px;padding:10px;">No process data available</div>';
+                if (pKeys.length === 0) {
+                    processHtml = '<div style="color:rgba(255,255,255,0.3);font-size:12px;padding:10px;">No process data available</div>';
+                }
                 document.getElementById('empDetailProcessList').innerHTML = processHtml;
 
+                // ===== Daily History Table =====
                 var historyHtml = '';
-                for (var r = 0; r < dailyRecords.length; r++) {
-                    var rec = dailyRecords[r];
-                    var prodColor = rec.productivity >= 85 ? '#22c55e' : rec.productivity >= 60 ? '#f59e0b' : '#ef4444';
+                for (var h = 0; h < dailyRecords.length; h++) {
+                    var rec = dailyRecords[h];
+                    var prodColor = rec.productivity >= 85 ? '[MAC_ADDRESS]e' : rec.productivity >= 60 ? '#f59e0b' : '#ef4444';
+                    var leakColor = rec.leakage > 60 ? '#ef4444' : '#f59e0b';
                     historyHtml += '<tr style="border-bottom:1px solid rgba(255,255,255,0.05);">' +
-                        '<td style="padding:8px;color:#e2e8f0;">'+rec.date+'</td>' +
-                        '<td style="padding:8px;color:#e2e8f0;text-align:center;">'+rec.session+' min</td>' +
-                        '<td style="padding:8px;color:#e2e8f0;text-align:center;">'+rec.tasks+'</td>' +
-                        '<td style="padding:8px;text-align:center;"><span style="color:'+prodColor+';font-weight:700;">'+rec.productivity+'%</span></td>' +
-                        '<td style="padding:8px;color:#e2e8f0;text-align:center;">'+rec.breakTime+' min</td>' +
-                        '<td style="padding:8px;color:#e2e8f0;text-align:center;">'+rec.prodDT+' min</td>' +
-                        '<td style="padding:8px;color:#e2e8f0;text-align:center;">'+rec.nonProdDT+' min</td>' +
-                        '<td style="padding:8px;color:'+(rec.leakage>60?'#ef4444':'#f59e0b')+';text-align:center;font-weight:600;">'+rec.leakage+' min</td></tr>';
+                        '<td style="padding:8px;color:#e2e8f0;">' + rec.date + '</td>' +
+                        '<td style="padding:8px;color:#e2e8f0;text-align:center;">' + rec.session + ' min</td>' +
+                        '<td style="padding:8px;color:#e2e8f0;text-align:center;">' + rec.tasks + '</td>' +
+                        '<td style="padding:8px;text-align:center;"><span style="color:' + prodColor + ';font-weight:700;">' + rec.productivity + '%</span></td>' +
+                        '<td style="padding:8px;color:#e2e8f0;text-align:center;">' + rec.breakTime + ' min</td>' +
+                        '<td style="padding:8px;color:#e2e8f0;text-align:center;">' + rec.prodDT + ' min</td>' +
+                        '<td style="padding:8px;color:#e2e8f0;text-align:center;">' + rec.nonProdDT + ' min</td>' +
+                        '<td style="padding:8px;color:' + leakColor + ';text-align:center;font-weight:600;">' + rec.leakage + ' min</td>' +
+                        '</tr>';
                 }
-                if (dailyRecords.length === 0) historyHtml = '<tr><td colspan="8" style="padding:15px;color:rgba(255,255,255,0.3);text-align:center;">No records found</td></tr>';
+                if (dailyRecords.length === 0) {
+                    historyHtml = '<tr><td colspan="8" style="padding:15px;color:rgba(255,255,255,0.3);text-align:center;">No records found for selected period</td></tr>';
+                }
                 document.getElementById('empDetailHistoryBody').innerHTML = historyHtml;
 
             } catch (error) {
                 console.error('[Stark] Error loading employee detail:', error);
                 document.getElementById('empDetailProcessList').innerHTML =
-                    '<div style="color:#ef4444;font-size:12px;padding:10px;">Error: '+error.message+'</div>';
+                    '<div style="color:#ef4444;font-size:12px;padding:10px;">Error loading data: ' + error.message + '</div>';
+                document.getElementById('empDetailHistoryBody').innerHTML =
+                    '<tr><td colspan="8" style="padding:15px;color:#ef4444;text-align:center;">Error: ' + error.message + '</td></tr>';
             }
         };
 
+        // ===== CLOSE MODAL =====
         window.closeEmpDetail = function() {
             document.getElementById('empDetailOverlay').classList.remove('active');
         };
 
+        // Close on overlay click
         document.getElementById('empDetailOverlay').addEventListener('click', function(e) {
             if (e.target === this) closeEmpDetail();
         });
 
+        // Close on Escape key
         document.addEventListener('keydown', function(e) {
             if (e.key === 'Escape') closeEmpDetail();
         });
