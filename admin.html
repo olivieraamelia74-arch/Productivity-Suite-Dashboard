@@ -1,0 +1,1019 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stark Dashboard - Admin Panel</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #0f172a; color: #e2e8f0; min-height: 100vh;
+        }
+        .navbar {
+            background: rgba(15,23,42,0.95);
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            padding: 12px 30px; display: flex;
+            justify-content: space-between; align-items: center;
+            position: sticky; top: 0; z-index: 100;
+            backdrop-filter: blur(10px);
+        }
+        .navbar h1 { font-size: 20px; color: #fff; }
+        .navbar h1 .stark { color: #f59e0b; }
+        .navbar .badge {
+            background: rgba(168,85,247,0.2); color: #a855f7;
+            padding: 3px 10px; border-radius: 20px;
+            font-size: 11px; margin-left: 10px;
+            border: 1px solid rgba(168,85,247,0.3);
+        }
+        .nav-right { display: flex; align-items: center; gap: 15px; }
+        .nav-right .user-info { color: rgba(255,255,255,0.7); font-size: 14px; }
+        .nav-right .user-info strong { color: #a855f7; }
+        .btn-logout {
+            padding: 8px 16px; background: rgba(239,68,68,0.2);
+            border: 1px solid rgba(239,68,68,0.3);
+            color: #ef4444; border-radius: 8px;
+            cursor: pointer; font-size: 13px;
+        }
+        .btn-logout:hover { background: rgba(239,68,68,0.3); }
+        .btn-back {
+            padding: 8px 16px; background: rgba(59,130,246,0.2);
+            border: 1px solid rgba(59,130,246,0.3);
+            color: #3b82f6; border-radius: 8px;
+            cursor: pointer; font-size: 13px; text-decoration: none;
+        }
+        .btn-back:hover { background: rgba(59,130,246,0.3); }
+
+        /* Tabs */
+        .tabs {
+            display: flex; gap: 0; border-bottom: 1px solid rgba(255,255,255,0.1);
+            padding: 0 30px; background: rgba(15,23,42,0.5);
+        }
+        .tab-btn {
+            padding: 14px 24px; background: none; border: none;
+            color: rgba(255,255,255,0.5); font-size: 14px; font-weight: 600;
+            cursor: pointer; border-bottom: 3px solid transparent;
+            transition: all 0.3s;
+        }
+        .tab-btn:hover { color: rgba(255,255,255,0.8); }
+        .tab-btn.active {
+            color: #a855f7; border-bottom-color: #a855f7;
+        }
+        .tab-content { display: none; padding: 25px 30px; }
+        .tab-content.active { display: block; }
+
+        /* Cards & Panels */
+        .panel {
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 14px; padding: 20px; margin-bottom: 20px;
+        }
+        .panel h3 {
+            font-size: 16px; color: rgba(255,255,255,0.8);
+            margin-bottom: 15px; padding-bottom: 10px;
+            border-bottom: 1px solid rgba(255,255,255,0.08);
+        }
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px; margin-bottom: 25px;
+        }
+        .stat-card {
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 12px; padding: 18px; text-align: center;
+        }
+        .stat-card .stat-value { font-size: 32px; font-weight: 700; color: #a855f7; }
+        .stat-card .stat-label { font-size: 11px; color: rgba(255,255,255,0.5); text-transform: uppercase; letter-spacing: 1px; margin-top: 5px; }
+
+        /* Forms */
+        .form-group { margin-bottom: 15px; }
+        .form-group label { display: block; color: rgba(255,255,255,0.6); font-size: 12px; margin-bottom: 5px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
+        .form-group input, .form-group select {
+            width: 100%; padding: 10px 14px; background: rgba(255,255,255,0.08);
+            border: 1px solid rgba(255,255,255,0.15); border-radius: 8px;
+            color: #fff; font-size: 14px;
+        }
+        .form-group input:focus, .form-group select:focus { outline: none; border-color: #a855f7; }
+        .form-group select option { color: #000; }
+        .form-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; }
+
+        /* Buttons */
+        .btn {
+            padding: 10px 20px; border: none; border-radius: 8px;
+            cursor: pointer; font-size: 13px; font-weight: 600; transition: all 0.3s;
+        }
+        .btn-purple { background: linear-gradient(135deg, #a855f7, #7c3aed); color: #fff; }
+        .btn-purple:hover { opacity: 0.9; transform: translateY(-1px); }
+        .btn-green { background: rgba(34,197,94,0.2); border: 1px solid rgba(34,197,94,0.3); color: #22c55e; }
+        .btn-green:hover { background: rgba(34,197,94,0.3); }
+        .btn-red { background: rgba(239,68,68,0.2); border: 1px solid rgba(239,68,68,0.3); color: #ef4444; }
+        .btn-red:hover { background: rgba(239,68,68,0.3); }
+        .btn-blue { background: rgba(59,130,246,0.2); border: 1px solid rgba(59,130,246,0.3); color: #3b82f6; }
+        .btn-blue:hover { background: rgba(59,130,246,0.3); }
+        .btn-amber { background: rgba(245,158,11,0.2); border: 1px solid rgba(245,158,11,0.3); color: #f59e0b; }
+        .btn-amber:hover { background: rgba(245,158,11,0.3); }
+
+        /* Tables */
+        table { width: 100%; border-collapse: collapse; }
+        th {
+            text-align: left; padding: 10px 12px;
+            background: rgba(255,255,255,0.05);
+            color: rgba(255,255,255,0.6); font-size: 12px;
+            text-transform: uppercase; letter-spacing: 0.5px;
+        }
+        td {
+            padding: 10px 12px;
+            border-top: 1px solid rgba(255,255,255,0.05);
+            font-size: 14px;
+        }
+        tr:hover { background: rgba(255,255,255,0.03); }
+
+        /* Alerts */
+        .alert {
+            padding: 12px 16px; border-radius: 8px; margin-bottom: 15px;
+            font-size: 13px; display: none;
+        }
+        .alert-success { background: rgba(34,197,94,0.15); border: 1px solid rgba(34,197,94,0.3); color: #22c55e; }
+        .alert-error { background: rgba(239,68,68,0.15); border: 1px solid rgba(239,68,68,0.3); color: #ef4444; }
+        .alert-info { background: rgba(59,130,246,0.15); border: 1px solid rgba(59,130,246,0.3); color: #3b82f6; }
+        .alert.show { display: block; }
+
+        /* Misc */
+        .action-btns { display: flex; gap: 8px; }
+        .badge-role {
+            padding: 3px 10px; border-radius: 20px;
+            font-size: 11px; font-weight: 600;
+        }
+        .badge-admin { background: rgba(168,85,247,0.2); color: #a855f7; }
+        .badge-manager { background: rgba(245,158,11,0.2); color: #f59e0b; }
+        .badge-employee { background: rgba(59,130,246,0.2); color: #3b82f6; }
+
+        @media (max-width: 768px) {
+            .tabs { overflow-x: auto; padding: 0 15px; }
+            .tab-btn { padding: 12px 16px; font-size: 12px; white-space: nowrap; }
+            .tab-content { padding: 15px; }
+            .form-row { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <h1>&#9889; <span class="stark">Stark</span> Dashboard <span class="badge">ADMIN</span></h1>
+        <div class="nav-right">
+            <div class="user-info">
+                Admin: <strong id="adminName">Loading...</strong>
+            </div>
+            <a href="manager.html" class="btn-back">&#8592; Manager View</a>
+            <button class="btn-logout" onclick="handleLogout()">Sign Out</button>
+        </div>
+    </nav>
+
+    <!-- TABS -->
+    <div class="tabs">
+        <button class="tab-btn active" onclick="switchTab('users')">&#128100; Users</button>
+        <button class="tab-btn" onclick="switchTab('teams')">&#128101; Teams</button>
+        <button class="tab-btn" onclick="switchTab('config')">&#9881; Configuration</button>
+        <button class="tab-btn" onclick="switchTab('data')">&#128202; Data Management</button>
+        <button class="tab-btn" onclick="switchTab('logs')">&#128220; Activity Logs</button>
+    </div>
+
+    <!-- ===== TAB: USERS ===== -->
+    <div class="tab-content active" id="tab-users">
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-value" id="statTotalUsers">--</div>
+                <div class="stat-label">Total Users</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="statAdmins">--</div>
+                <div class="stat-label">Admins</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="statManagers">--</div>
+                <div class="stat-label">Managers</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="statEmployees">--</div>
+                <div class="stat-label">Employees</div>
+            </div>
+        </div>
+
+        <!-- Add User Form -->
+        <div class="panel">
+            <h3>&#10133; Add New User</h3>
+            <div id="alertAddUser" class="alert"></div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Full Name</label>
+                    <input type="text" id="newUserName" placeholder="e.g. Shouvik Banerjee">
+                </div>
+                <div class="form-group">
+                    <label>Email (Login Alias)</label>
+                    <input type="email" id="newUserEmail" placeholder="e.g. shouvik@starkteam.com">
+                </div>
+                <div class="form-group">
+                    <label>Password</label>
+                    <input type="password" id="newUserPassword" placeholder=[PASSWORD]n 6 characters">
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Role</label>
+                    <select id="newUserRole">
+                        <option value="employee">Employee</option>
+                        <option value="manager">Manager</option>
+                        <option value="admin">Admin</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Team</label>
+                    <select id="newUserTeam">
+                        <option value="TeamA">Team A</option>
+                        <option value="TeamB">Team B</option>
+                        <option value="TeamC">Team C</option>
+                    </select>
+                </div>
+                <div class="form-group" style="display:flex;align-items:flex-end;">
+                    <button class="btn btn-purple" onclick="addNewUser()">&#10133; Create User</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Users Table -->
+        <div class="panel">
+            <h3>&#128100; All Users</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Email</th>
+                        <th>Role</th>
+                        <th>Team</th>
+                        <th>Created</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="usersTableBody">
+                    <tr><td colspan="6" style="text-align:center;padding:30px;color:rgba(255,255,255,0.4);">Loading users...</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- ===== TAB: TEAMS ===== -->
+    <div class="tab-content" id="tab-teams">
+        <div class="panel">
+            <h3>&#10133; Create New Team</h3>
+            <div id="alertAddTeam" class="alert"></div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Team Name</label>
+                    <input type="text" id="newTeamName" placeholder="e.g. TeamD">
+                </div>
+                <div class="form-group">
+                    <label>Team Lead (Email)</label>
+                    <input type="text" id="newTeamLead" placeholder="e.g. sunita@starkteam.com">
+                </div>
+                <div class="form-group" style="display:flex;align-items:flex-end;">
+                    <button class="btn btn-purple" onclick="addNewTeam()">&#10133; Create Team</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="panel">
+            <h3>&#128101; All Teams</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Team Name</th>
+                        <th>Team Lead</th>
+                        <th>Members</th>
+                        <th>Created</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="teamsTableBody">
+                    <tr><td colspan="5" style="text-align:center;padding:30px;color:rgba(255,255,255,0.4);">Loading teams...</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- ===== TAB: CONFIGURATION ===== -->
+    <div class="tab-content" id="tab-config">
+        <div class="panel">
+            <h3>&#9201; Shift Configuration</h3>
+            <div id="alertConfig" class="alert"></div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Shift Duration (minutes)</label>
+                    <input type="number" id="cfgShiftMinutes" value="540" min="60" max="720">
+                </div>
+                <div class="form-group">
+                    <label>Half-Day Duration (minutes)</label>
+                    <input type="number" id="cfgHalfDay" value="270" min="30" max="360">
+                </div>
+                <div class="form-group">
+                    <label>Overtime Threshold (minutes)</label>
+                    <input type="number" id="cfgOvertime" value="570" min="60" max="720">
+                </div>
+            </div>
+        </div>
+
+        <div class="panel">
+            <h3>&#127942; Productivity Thresholds</h3>
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Excellent (% and above)</label>
+                    <input type="number" id="cfgExcellent" value="85" min="0" max="100">
+                </div>
+                <div class="form-group">
+                    <label>Good (% and above)</label>
+                    <input type="number" id="cfgGood" value="60" min="0" max="100">
+                </div>
+                <div class="form-group">
+                    <label>Max Allowed Leakage (minutes)</label>
+                    <input type="number" id="cfgMaxLeakage" value="60" min="0" max="300">
+                </div>
+            </div>
+        </div>
+
+        <div class="panel">
+            <h3>&#128227; Announcements</h3>
+            <div class="form-group">
+                <label>Login Banner Message (shown to all users on login)</label>
+                <input type="text" id="cfgAnnouncement" placeholder="e.g. System maintenance on Sunday 10 PM - 2 AM">
+            </div>
+        </div>
+
+        <div style="margin-top:15px;">
+            <button class="btn btn-purple" onclick="saveConfig()">&#128190; Save All Configuration</button>
+        </div>
+    </div>
+
+    <!-- ===== TAB: DATA MANAGEMENT ===== -->
+    <div class="tab-content" id="tab-data">
+        <div class="panel">
+            <h3>&#128202; Productivity Records</h3>
+            <div id="alertData" class="alert"></div>
+            <div class="form-row" style="margin-bottom:15px;">
+                <div class="form-group">
+                    <label>Filter by User</label>
+                    <select id="dataFilterUser">
+                        <option value="all">All Users</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>From Date</label>
+                    <input type="date" id="dataStartDate">
+                </div>
+                <div class="form-group">
+                    <label>To Date</label>
+                    <input type="date" id="dataEndDate">
+                </div>
+                <div class="form-group" style="display:flex;align-items:flex-end;gap:8px;">
+                    <button class="btn btn-blue" onclick="loadProductivityData()">&#128269; Search</button>
+                    <button class="btn btn-green" onclick="exportCSV()">&#128229; Export CSV</button>
+                </div>
+            </div>
+            <div style="overflow-x:auto;">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>User</th>
+                            <th>Team</th>
+                            <th>Session</th>
+                            <th>Tasks</th>
+                            <th>Productivity</th>
+                            <th>Break</th>
+                            <th>Leakage</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="dataTableBody">
+                        <tr><td colspan="9" style="text-align:center;padding:30px;color:rgba(255,255,255,0.4);">Use filters above to load data</td></tr>
+                    </tbody>
+                </table>
+            </div>
+            <div id="dataCount" style="margin-top:10px;color:rgba(255,255,255,0.4);font-size:12px;"></div>
+        </div>
+    </div>
+
+    <!-- ===== TAB: ACTIVITY LOGS ===== -->
+    <div class="tab-content" id="tab-logs">
+        <div class="panel">
+            <h3>&#128220; Recent Activity</h3>
+            <div style="margin-bottom:15px;">
+                <button class="btn btn-blue" onclick="loadActivityLogs()">&#128260; Refresh Logs</button>
+            </div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Timestamp</th>
+                        <th>User</th>
+                        <th>Action</th>
+                        <th>Details</th>
+                    </tr>
+                </thead>
+                <tbody id="logsTableBody">
+                    <tr><td colspan="4" style="text-align:center;padding:30px;color:rgba(255,255,255,0.4);">Click Refresh to load logs</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-app.js";
+        import { getAuth, onAuthStateChanged, signOut, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-auth.js";
+        import { getFirestore, collection, query, where, orderBy, getDocs, getDoc, setDoc, updateDoc, deleteDoc, doc, limit } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-firestore.js";
+
+        var firebaseConfig = {
+            apiKey: "AIzaSyBfQArXV1ufPc11kLZGkGygcx6y2wObUJs",
+            authDomain: "productivity-suite-a0329.firebaseapp.com",
+            projectId: "productivity-suite-a0329",
+            storageBucket: "productivity-suite-a0329.firebasestorage.app",
+            messagingSenderId: "373942539246",
+            appId: "1:373942539246:web:c7875b5cec318683a674ff",
+            measurementId: "G-CTBY459SLP"
+        };
+
+        var app = initializeApp(firebaseConfig);
+        var auth = getAuth(app);
+        var db = getFirestore(app);
+        var currentUser = null;
+        var userProfile = null;
+        var allUsers = [];
+        var allTeams = [];
+
+        // ===== AUTH CHECK =====
+        onAuthStateChanged(auth, async function(user) {
+            if (!user) { window.location.href = 'index.html'; return; }
+            currentUser = user;
+            try {
+                var userDoc = await getDoc(doc(db, "user", user.uid));
+                if (userDoc.exists()) {
+                    userProfile = userDoc.data();
+                    if (userProfile.role !== 'admin') {
+                        alert('Access denied. Admin role required.');
+                        window.location.href = 'index.html';
+                        return;
+                    }
+                    document.getElementById('adminName').textContent = userProfile.name || user.email;
+                } else {
+                    alert('User profile not found.');
+                    await signOut(auth);
+                    window.location.href = 'index.html';
+                    return;
+                }
+                loadAllUsers();
+                loadAllTeams();
+                loadConfig();
+            } catch (error) {
+                console.error('[Admin] Auth error:', error);
+                alert('Error: ' + error.message);
+                await signOut(auth);
+                window.location.href = 'index.html';
+            }
+        });
+
+        // ===== LOGOUT =====
+        window.handleLogout = async function() {
+            await signOut(auth);
+            window.location.href = 'index.html';
+        };
+
+        // ===== TAB SWITCHING =====
+        window.switchTab = function(tabName) {
+            document.querySelectorAll('.tab-btn').forEach(function(btn) { btn.classList.remove('active'); });
+            document.querySelectorAll('.tab-content').forEach(function(tab) { tab.classList.remove('active'); });
+            document.getElementById('tab-' + tabName).classList.add('active');
+            event.target.classList.add('active');
+        };
+
+        // ===== SHOW ALERT =====
+        function showAlert(elementId, message, type) {
+            var el = document.getElementById(elementId);
+            el.className = 'alert alert-' + type + ' show';
+            el.textContent = message;
+            setTimeout(function() { el.classList.remove('show'); }, 5000);
+        }
+
+        // ===== LOAD ALL USERS =====
+        async function loadAllUsers() {
+            try {
+                var snapshot = await getDocs(collection(db, "user"));
+                allUsers = [];
+                snapshot.forEach(function(d) {
+                    var data = d.data();
+                    data.uid = d.id;
+                    allUsers.push(data);
+                });
+
+                // Update stats
+                var admins = 0, managers = 0, employees = 0;
+                for (var i = 0; i < allUsers.length; i++) {
+                    if (allUsers[i].role === 'admin') admins++;
+                    else if (allUsers[i].role === 'manager') managers++;
+                    else employees++;
+                }
+                document.getElementById('statTotalUsers').textContent = allUsers.length;
+                document.getElementById('statAdmins').textContent = admins;
+                document.getElementById('statManagers').textContent = managers;
+                document.getElementById('statEmployees').textContent = employees;
+
+                // Populate users table
+                var tbody = document.getElementById('usersTableBody');
+                if (allUsers.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:30px;color:rgba(255,255,255,0.4);">No users found</td></tr>';
+                    return;
+                }
+
+                var html = '';
+                for (var i = 0; i < allUsers.length; i++) {
+                    var u = allUsers[i];
+                    var roleClass = u.role === 'admin' ? 'badge-admin' : u.role === 'manager' ? 'badge-manager' : 'badge-employee';
+                    html += '<tr>';
+                    html += '<td><strong style="color:#fff;">' + (u.name || 'N/A') + '</strong></td>';
+                    html += '<td style="color:rgba(255,255,255,0.6);">' + (u.email || 'N/A') + '</td>';
+                    html += '<td><span class="badge-role ' + roleClass + '">' + (u.role || 'employee') + '</span></td>';
+                    html += '<td>' + (u.team || '--') + '</td>';
+                    html += '<td style="color:rgba(255,255,255,0.5);font-size:12px;">' + (u.createdAt || '--') + '</td>';
+                    html += '<td><div class="action-btns">';
+                    html += '<button class="btn btn-amber" style="padding:5px 10px;font-size:11px;" onclick="editUser(\'' + u.uid + '\')">Edit</button>';
+                    html += '<button class="btn btn-red" style="padding:5px 10px;font-size:11px;" onclick="deleteUser(\'' + u.uid + '\',\'' + (u.name || '').replace(/'/g, "\\'") + '\')">Delete</button>';
+                    html += '</div></td>';
+                    html += '</tr>';
+                }
+                tbody.innerHTML = html;
+
+                // Populate data filter dropdown
+                var dataSelect = document.getElementById('dataFilterUser');
+                dataSelect.innerHTML = '<option value="all">All Users</option>';
+                for (var i = 0; i < allUsers.length; i++) {
+                    dataSelect.innerHTML += '<option value="' + allUsers[i].uid + '">' + (allUsers[i].name || allUsers[i].email) + '</option>';
+                }
+
+            } catch (error) {
+                console.error('[Admin] Error loading users:', error);
+                document.getElementById('usersTableBody').innerHTML =
+                    '<tr><td colspan="6" style="text-align:center;padding:30px;color:#ef4444;">Error: ' + error.message + '</td></tr>';
+            }
+        }
+
+        // ===== ADD NEW USER =====
+        window.addNewUser = async function() {
+            var name = document.getElementById('newUserName').value.trim();
+            var email = document.getElementById('newUserEmail').value.trim();
+            var password = document.getElementById('newUserPassword').value;
+            var role = document.getElementById('newUserRole').value;
+            var team = document.getElementById('newUserTeam').value;
+
+            if (!name || !email || !password) {
+                showAlert('alertAddUser', 'Please fill in all required fields.', 'error');
+                return;
+            }
+            if (password.length < 6) {
+                showAlert('alertAddUser', 'Password must be at least 6 characters.', 'error');
+                return;
+            }
+
+            try {
+                // Create auth user
+                var userCredential = await createUserWithEmailAndPassword(auth, email, password);
+                var uid = userCredential.user.uid;
+
+                // Create Firestore profile
+                var today = new Date().toISOString().split('T');
+                await setDoc(doc(db, "user", uid), {
+                    name: name,
+                    email: email,
+                    role: role,
+                    team: team,
+                    createdAt: today
+                });
+
+                // Log activity
+                await logActivity('User Created', 'Created user: ' + name + ' (' + email + ') as ' + role);
+
+                showAlert('alertAddUser', 'User "' + name + '" created successfully!', 'success');
+                document.getElementById('newUserName').value = '';
+                document.getElementById('newUserEmail').value = '';
+                document.getElementById('newUserPassword').value = '';
+
+                // NOTE: Creating a user with createUserWithEmailAndPassword signs you in as that user
+                // We need to sign back in as admin - for now just reload
+                showAlert('alertAddUser', 'User created! Page will reload to restore admin session...', 'info');
+                setTimeout(function() { window.location.reload(); }, 2000);
+
+            } catch (error) {
+                console.error('[Admin] Error creating user:', error);
+                showAlert('alertAddUser', 'Error: ' + error.message, 'error');
+            }
+        };
+
+        // ===== EDIT USER =====
+        window.editUser = async function(uid) {
+            var user = null;
+            for (var i = 0; i < allUsers.length; i++) {
+                if (allUsers[i].uid === uid) { user = allUsers[i]; break; }
+            }
+            if (!user) return;
+
+            var newRole = prompt('Change role for ' + user.name + ':Current: ' + user.role + 'Enter new role (admin / manager / employee):', user.role);
+            if (!newRole || !['admin', 'manager', 'employee'].includes(newRole.toLowerCase())) {
+                if (newRole !== null) alert('Invalid role. Use: admin, manager, or employee');
+                return;
+            }
+
+            var newTeam = prompt('Change team for ' + user.name + ':Current: ' + (user.team || 'None') + 'Enter new team (TeamA / TeamB / TeamC):', user.team || 'TeamA');
+            if (newTeam === null) return;
+
+            try {
+                await updateDoc(doc(db, "user", uid), {
+                    role: newRole.toLowerCase(),
+                    team: newTeam
+                });
+                await logActivity('User Updated', 'Updated ' + user.name + ': role=' + newRole + ', team=' + newTeam);
+                showAlert('alertAddUser', 'User "' + user.name + '" updated successfully!', 'success');
+                loadAllUsers();
+            } catch (error) {
+                alert('Error updating user: ' + error.message);
+            }
+        };
+
+        // ===== DELETE USER =====
+        window.deleteUser = async function(uid, name) {
+            if (!confirm('Are you sure you want to delete user "' + name + '"?This will remove their profile from Firestore. \n(Note: Their Firebase Auth account will remain - delete from Firebase Console)')) {
+                return;
+            }
+            try {
+                await deleteDoc(doc(db, "user", uid));
+                await logActivity('User Deleted', 'Deleted user profile: ' + name);
+                showAlert('alertAddUser', 'User "' + name + '" profile deleted.', 'success');
+                loadAllUsers();
+            } catch (error) {
+                alert('Error deleting user: ' + error.message);
+            }
+        };
+
+        // ===== LOAD ALL TEAMS =====
+        async function loadAllTeams() {
+            try {
+                var snapshot = await getDocs(collection(db, "teams"));
+                allTeams = [];
+                snapshot.forEach(function(d) {
+                    var data = d.data();
+                    data.id = d.id;
+                    allTeams.push(data);
+                });
+
+                // Count members per team from users
+                var teamMembers = {};
+                for (var i = 0; i < allUsers.length; i++) {
+                    var t = allUsers[i].team || 'Unassigned';
+                    if (!teamMembers[t]) teamMembers[t] = 0;
+                    teamMembers[t]++;
+                }
+
+                var tbody = document.getElementById('teamsTableBody');
+                if (allTeams.length === 0) {
+                    // Show teams from user data if no teams collection exists
+                    var teamNames = Object.keys(teamMembers);
+                    if (teamNames.length === 0) {
+                        tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;padding:30px;color:rgba(255,255,255,0.4);">No teams found. Create one above.</td></tr>';
+                        return;
+                    }
+                    var html = '';
+                    for (var i = 0; i < teamNames.length; i++) {
+                        html += '<tr>';
+                        html += '<td><strong style="color:#fff;">' + teamNames[i] + '</strong></td>';
+                        html += '<td style="color:rgba(255,255,255,0.5);">--</td>';
+                        html += '<td>' + (teamMembers[teamNames[i]] || 0) + ' members</td>';
+                        html += '<td style="color:rgba(255,255,255,0.5);">--</td>';
+                        html += '<td><span style="color:rgba(255,255,255,0.3);font-size:12px;">Auto-detected from users</span></td>';
+                        html += '</tr>';
+                    }
+                    tbody.innerHTML = html;
+                    return;
+                }
+
+                var html = '';
+                for (var i = 0; i < allTeams.length; i++) {
+                    var t = allTeams[i];
+                    html += '<tr>';
+                    html += '<td><strong style="color:#fff;">' + (t.name || t.id) + '</strong></td>';
+                    html += '<td style="color:rgba(255,255,255,0.6);">' + (t.lead || '--') + '</td>';
+                    html += '<td>' + (teamMembers[t.name || t.id] || 0) + ' members</td>';
+                    html += '<td style="color:rgba(255,255,255,0.5);font-size:12px;">' + (t.createdAt || '--') + '</td>';
+                    html += '<td><div class="action-btns">';
+                    html += '<button class="btn btn-red" style="padding:5px 10px;font-size:11px;" onclick="deleteTeam(\'' + t.id + '\')">Delete</button>';
+                    html += '</div></td>';
+                    html += '</tr>';
+                }
+                tbody.innerHTML = html;
+
+                // Update team dropdown in Add User form
+                var teamSelect = document.getElementById('newUserTeam');
+                teamSelect.innerHTML = '';
+                var allTeamNames = Object.keys(teamMembers);
+                for (var i = 0; i < allTeamNames.length; i++) {
+                    teamSelect.innerHTML += '<option value="' + allTeamNames[i] + '">' + allTeamNames[i] + '</option>';
+                }
+                for (var i = 0; i < allTeams.length; i++) {
+                    var tName = allTeams[i].name || allTeams[i].id;
+                    if (allTeamNames.indexOf(tName) === -1) {
+                        teamSelect.innerHTML += '<option value="' + tName + '">' + tName + '</option>';
+                    }
+                }
+
+            } catch (error) {
+                console.error('[Admin] Error loading teams:', error);
+            }
+        }
+
+        // ===== ADD NEW TEAM =====
+        window.addNewTeam = async function() {
+            var teamName = document.getElementById('newTeamName').value.trim();
+            var teamLead = document.getElementById('newTeamLead').value.trim();
+
+            if (!teamName) {
+                showAlert('alertAddTeam', 'Please enter a team name.', 'error');
+                return;
+            }
+
+            try {
+                var today = new Date().toISOString().split('T');
+                await setDoc(doc(db, "teams", teamName), {
+                    name: teamName,
+                    lead: teamLead,
+                    createdAt: today
+                });
+                await logActivity('Team Created', 'Created team: ' + teamName + ' (Lead: ' + teamLead + ')');
+                showAlert('alertAddTeam', 'Team "' + teamName + '" created!', 'success');
+                document.getElementById('newTeamName').value = '';
+                document.getElementById('newTeamLead').value = '';
+                loadAllTeams();
+            } catch (error) {
+                showAlert('alertAddTeam', 'Error: ' + error.message, 'error');
+            }
+        };
+
+        // ===== DELETE TEAM =====
+        window.deleteTeam = async function(teamId) {
+            if (!confirm('Delete team "' + teamId + '"? Members will not be removed.')) return;
+            try {
+                await deleteDoc(doc(db, "teams", teamId));
+                await logActivity('Team Deleted', 'Deleted team: ' + teamId);
+                loadAllTeams();
+            } catch (error) {
+                alert('Error: ' + error.message);
+            }
+        };
+
+        // ===== LOAD CONFIG =====
+        async function loadConfig() {
+            try {
+                var configDoc = await getDoc(doc(db, "settings", "config"));
+                if (configDoc.exists()) {
+                    var cfg = configDoc.data();
+                    if (cfg.shiftMinutes) document.getElementById('cfgShiftMinutes').value = cfg.shiftMinutes;
+                    if (cfg.halfDay) document.getElementById('cfgHalfDay').value = cfg.halfDay;
+                    if (cfg.overtime) document.getElementById('cfgOvertime').value = cfg.overtime;
+                    if (cfg.excellent) document.getElementById('cfgExcellent').value = cfg.excellent;
+                    if (cfg.good) document.getElementById('cfgGood').value = cfg.good;
+                    if (cfg.maxLeakage) document.getElementById('cfgMaxLeakage').value = cfg.maxLeakage;
+                    if (cfg.announcement) document.getElementById('cfgAnnouncement').value = cfg.announcement;
+                }
+            } catch (error) {
+                console.warn('[Admin] No config found, using defaults:', error);
+            }
+        }
+
+        // ===== SAVE CONFIG =====
+        window.saveConfig = async function() {
+            var config = {
+                shiftMinutes: parseInt(document.getElementById('cfgShiftMinutes').value) || 540,
+                halfDay: parseInt(document.getElementById('cfgHalfDay').value) || 270,
+                overtime: parseInt(document.getElementById('cfgOvertime').value) || 570,
+                excellent: parseInt(document.getElementById('cfgExcellent').value) || 85,
+                good: parseInt(document.getElementById('cfgGood').value) || 60,
+                maxLeakage: parseInt(document.getElementById('cfgMaxLeakage').value) || 60,
+                announcement: document.getElementById('cfgAnnouncement').value.trim(),
+                updatedAt: new Date().toISOString().split('T'),
+                updatedBy: userProfile.name || currentUser.email
+            };
+
+            try {
+                await setDoc(doc(db, "settings", "config"), config);
+                await logActivity('Config Updated', 'Shift: ' + config.shiftMinutes + 'min, Excellent: ' + config.excellent + '%, Good: ' + config.good + '%');
+                showAlert('alertConfig', 'Configuration saved successfully!', 'success');
+            } catch (error) {
+                showAlert('alertConfig', 'Error saving config: ' + error.message, 'error');
+            }
+        };
+
+        // ===== LOAD PRODUCTIVITY DATA =====
+        window.loadProductivityData = async function() {
+            var userFilter = document.getElementById('dataFilterUser').value;
+            var startDate = document.getElementById('dataStartDate').value;
+            var endDate = document.getElementById('dataEndDate').value;
+
+            if (!startDate || !endDate) {
+                showAlert('alertData', 'Please select both From and To dates.', 'error');
+                return;
+            }
+
+            try {
+                var q;
+                if (userFilter === 'all') {
+                    q = query(
+                        collection(db, "productivity"),
+                        where("date", ">=", startDate),
+                        where("date", "<=", endDate),
+                        orderBy("date", "desc")
+                    );
+                } else {
+                    q = query(
+                        collection(db, "productivity"),
+                        where("userId", "==", userFilter),
+                        where("date", ">=", startDate),
+                        where("date", "<=", endDate),
+                        orderBy("date", "desc")
+                    );
+                }
+
+                var snapshot = await getDocs(q);
+                var records = [];
+                snapshot.forEach(function(d) {
+                    var data = d.data();
+                    data.docId = d.id;
+                    records.push(data);
+                });
+
+                var tbody = document.getElementById('dataTableBody');
+                if (records.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="9" style="text-align:center;padding:30px;color:rgba(255,255,255,0.4);">No records found for this filter.</td></tr>';
+                    document.getElementById('dataCount').textContent = '0 records found';
+                    return;
+                }
+
+                // Build user name lookup
+                var nameMap = {};
+                for (var i = 0; i < allUsers.length; i++) {
+                    nameMap[allUsers[i].uid] = allUsers[i].name || allUsers[i].email;
+                }
+
+                var SHIFT = parseInt(document.getElementById('cfgShiftMinutes').value) || 540;
+                var html = '';
+                for (var i = 0; i < records.length; i++) {
+                    var r = records[i];
+                    var sessionMin = parseInt(r.session_time) || 0;
+                    var breakMin = parseInt(r.break_time) || 0;
+                    var prodDT = parseInt(r.productive_downtime) || 0;
+                    var nonProdDT = parseInt(r.non_productive_downtime) || 0;
+                    var leakage = Math.max(0, SHIFT - sessionMin - breakMin - prodDT - nonProdDT);
+                    var prodPct = r.productivity_pct || 0;
+                    var userName = nameMap[r.userId] || r.email || r.userId || 'Unknown';
+
+                    var prodColor = prodPct >= 85 ? '#22c55e' : prodPct >= 60 ? '#f59e0b' : '#ef4444';
+                    var leakColor = leakage > 60 ? '#ef4444' : '#f59e0b';
+
+                    html += '<tr>';
+                    html += '<td style="color:rgba(255,255,255,0.7);">' + (r.date || '--') + '</td>';
+                    html += '<td><strong style="color:#fff;">' + userName + '</strong></td>';
+                    html += '<td>' + (r.team || '--') + '</td>';
+                    html += '<td>' + sessionMin + ' min</td>';
+                    html += '<td>' + (r.tasks_completed || 0) + '</td>';
+                    html += '<td style="color:' + prodColor + ';font-weight:600;">' + prodPct + '%</td>';
+                    html += '<td>' + breakMin + ' min</td>';
+                    html += '<td style="color:' + leakColor + ';">' + leakage + ' min</td>';
+                    html += '<td><button class="btn btn-red" style="padding:4px 8px;font-size:10px;" onclick="deleteRecord(\'' + r.docId + '\')">&#128465;</button></td>';
+                    html += '</tr>';
+                }
+                tbody.innerHTML = html;
+                document.getElementById('dataCount').textContent = records.length + ' records found';
+
+                // Store for export
+                window._exportData = records;
+                window._nameMap = nameMap;
+                window._SHIFT = SHIFT;
+
+            } catch (error) {
+                console.error('[Admin] Error loading data:', error);
+                showAlert('alertData', 'Error: ' + error.message, 'error');
+            }
+        };
+
+        // ===== DELETE RECORD =====
+        window.deleteRecord = async function(docId) {
+            if (!confirm('Delete this productivity record? This cannot be undone.')) return;
+            try {
+                await deleteDoc(doc(db, "productivity", docId));
+                await logActivity('Record Deleted', 'Deleted productivity record: ' + docId);
+                showAlert('alertData', 'Record deleted.', 'success');
+                loadProductivityData();
+            } catch (error) {
+                alert('Error: ' + error.message);
+            }
+        };
+
+        // ===== EXPORT CSV =====
+        window.exportCSV = function() {
+            if (!window._exportData || window._exportData.length === 0) {
+                showAlert('alertData', 'No data to export. Run a search first.', 'error');
+                return;
+            }
+
+            var SHIFT = window._SHIFT || 540;
+            var nameMap = window._nameMap || {};
+            var records = window._exportData;
+
+            var csv = 'Date,User,Team,Session (min),Tasks,Productivity %,Break (min),Prod DT (min),Non-Prod DT (min),Leakage (min)';
+            for (var i = 0; i < records.length; i++) {
+                var r = records[i];
+                var sessionMin = parseInt(r.session_time) || 0;
+                var breakMin = parseInt(r.break_time) || 0;
+                var prodDT = parseInt(r.productive_downtime) || 0;
+                var nonProdDT = parseInt(r.non_productive_downtime) || 0;
+                var leakage = Math.max(0, SHIFT - sessionMin - breakMin - prodDT - nonProdDT);
+                var userName = nameMap[r.userId] || r.email || 'Unknown';
+
+                csv += (r.date || '') + ',' + userName.replace(/,/g, ' ') + ',' + (r.team || '') + ',';
+                csv += sessionMin + ',' + (r.tasks_completed || 0) + ',' + (r.productivity_pct || 0) + ',';
+                csv += breakMin + ',' + prodDT + ',' + nonProdDT + ',' + leakage + '';
+            }
+
+            var blob = new Blob([csv], { type: 'text/csv' });
+            var url = URL.createObjectURL(blob);
+            var a = document.createElement('a');
+            a.href = url;
+            a.download = 'stark_productivity_export_' + new Date().toISOString().split('T') + '.csv';
+            a.click();
+            URL.revokeObjectURL(url);
+
+            logActivity('Data Exported', 'Exported ' + records.length + ' records to CSV');
+        };
+
+        // ===== ACTIVITY LOGS =====
+        async function logActivity(action, details) {
+            try {
+                var timestamp = new Date().toISOString();
+                var logId = timestamp.replace(/[:.]/g, '-');
+                await setDoc(doc(db, "activity_logs", logId), {
+                    timestamp: timestamp,
+                    user: userProfile ? userProfile.name : (currentUser ? currentUser.email : 'System'),
+                    action: action,
+                    details: details
+                });
+            } catch (error) {
+                console.warn('[Admin] Could not write log:', error);
+            }
+        }
+
+        window.loadActivityLogs = async function() {
+            try {
+                var q = query(
+                    collection(db, "activity_logs"),
+                    orderBy("timestamp", "desc"),
+                    limit(50)
+                );
+                var snapshot = await getDocs(q);
+                var tbody = document.getElementById('logsTableBody');
+
+                if (snapshot.empty) {
+                    tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;padding:30px;color:rgba(255,255,255,0.4);">No activity logs found.</td></tr>';
+                    return;
+                }
+
+                var html = '';
+                snapshot.forEach(function(d) {
+                    var log = d.data();
+                    var ts = log.timestamp || '--';
+                    if (ts.length > 19) ts = ts.substring(0, 19).replace('T', ' ');
+
+                    var actionColor = '#3b82f6';
+                    if (log.action && log.action.includes('Delete')) actionColor = '#ef4444';
+                    else if (log.action && log.action.includes('Create')) actionColor = '#22c55e';
+                    else if (log.action && log.action.includes('Update')) actionColor = '#f59e0b';
+                    else if (log.action && log.action.includes('Export')) actionColor = '#a855f7';
+
+                    html += '<tr>';
+                    html += '<td style="color:rgba(255,255,255,0.5);font-size:12px;white-space:nowrap;">' + ts + '</td>';
+                    html += '<td style="color:#fff;">' + (log.user || '--') + '</td>';
+                    html += '<td style="color:' + actionColor + ';font-weight:600;">' + (log.action || '--') + '</td>';
+                    html += '<td style="color:rgba(255,255,255,0.6);font-size:13px;">' + (log.details || '--') + '</td>';
+                    html += '</tr>';
+                });
+                tbody.innerHTML = html;
+
+            } catch (error) {
+                console.error('[Admin] Error loading logs:', error);
+                document.getElementById('logsTableBody').innerHTML =
+                    '<tr><td colspan="4" style="text-align:center;padding:30px;color:#ef4444;">Error: ' + error.message + '</td></tr>';
+            }
+        };
+    </script>
+</body>
+</html>
